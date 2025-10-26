@@ -1,1 +1,135 @@
-/* You can add global styles to this file, and also import other style files */
+/* ---------- RESET ---------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- BASE ---------- */
+html, body {
+    height: 100%;
+    width: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    color-scheme: light dark;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+}
+
+/* ---------- ROOT VARIABLES ---------- */
+:root {
+    --bg-color: #f7f9fb;
+    --text-color: #1e1e1e;
+    --accent-color: #007bff;
+    --border-color: #e1e4e8;
+    --card-bg: #ffffff;
+    --radius: 8px;
+    --shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Mode (auto based on user OS) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #f2f2f2;
+        --accent-color: #4f8cff;
+        --border-color: #2a2a2a;
+        --card-bg: #222;
+    }
+}
+
+/* ---------- TYPOGRAPHY ---------- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* ---------- LINKS ---------- */
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover {
+    color: darken(var(--accent-color), 10%);
+}
+
+/* ---------- BUTTONS ---------- */
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border: none;
+    border-radius: var(--radius);
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.6em 1.2em;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+button:hover {
+    background-color: #0062cc;
+}
+button:active {
+    transform: scale(0.98);
+}
+
+/* ---------- INPUTS ---------- */
+input, select, textarea {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.6em 0.8em;
+    font-size: 1rem;
+    background: var(--card-bg);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-color);
+}
+
+/* ---------- CONTAINERS ---------- */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ---------- CARDS ---------- */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
