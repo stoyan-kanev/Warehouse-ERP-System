@@ -154,4 +154,6 @@ class MeView(APIView):
         return Response({
             "id": user.id,
             "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
         })

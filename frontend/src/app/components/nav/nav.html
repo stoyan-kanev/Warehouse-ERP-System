@@ -1,8 +1,15 @@
 <nav class="nav_wrapper">
-    <h1><a routerLink="/">Warehouse-EPR Lite</a></h1>
-    <ul class="nav_list">
-        <a routerLink="/login">Login</a>
-        <a routerLink="/register">Register</a>
-        <a routerLink="/">Logout</a>
-    </ul>
+    <h1><a routerLink="/">🏠 Home</a></h1>
+    <div>
+        @if (user$ | async; as user) {
+            <span class="user-info">👤 {{ user.first_name }} {{ user.last_name }}</span>
+            <button (click)="logout()">Logout</button>
+        } @else {
+            <div class="nav_list">
+                <a routerLink="/login">Login</a>
+                <a routerLink="/register">Register</a>
+            </div>
+
+        }
+    </div>
 </nav>

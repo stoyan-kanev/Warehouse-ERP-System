@@ -1,5 +1,5 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
     BehaviorSubject,
     Observable,
@@ -10,21 +10,42 @@ import {
     map,
     filter,
 } from 'rxjs';
-import {Router} from '@angular/router';
-import {User} from './user-interface';
-import {environment} from '../../environments/environment';
+import { Router } from '@angular/router';
+import { User } from './user-interface';
+import { environment } from '../../environments/environment';
 
 function isUser(u: User | null): u is User {
     return u !== null;
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
     private apiUrl = `${environment.apiUrl}/users/`;
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
-    constructor(private http: HttpClient, private router: Router) {
+    constructor(private http: HttpClient, private router: Router) {}
+
+    // 👇 Автоматично зареждане на потребителя при стартиране (reload)
+    initUserSession(): void {
+        const cached = localStorage.getItem('user');
+        if (cached) {
+            this.currentUserSubject.next(JSON.parse(cached));
+        }
+
+        // Проверка от бекенда дали има активна сесия (cookie)
+        this.getCurrentUser().subscribe({
+            next: (user) => {
+                if (user) {
+                    localStorage.setItem('user', JSON.stringify(user));
+                } else {
+                    localStorage.removeItem('user');
+                }
+            },
+            error: () => {
+                localStorage.removeItem('user');
+            },
+        });
     }
 
     isLoggedIn(): boolean {
@@ -33,9 +54,14 @@ export class AuthService {
 
     login(email: string, password: string): Observable<User> {
         return this.http
-            .post(`${this.apiUrl}login/`, {email, password}, {withCredentials: true})
+            .post(`${this.apiUrl}login/`, { email, password }, { withCredentials: true })
             .pipe(
                 switchMap(() => this.getCurrentUser()),
+                tap((user) => {
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                }),
                 filter(isUser)
             );
     }
@@ -44,17 +70,22 @@ export class AuthService {
         return this.http
             .post(
                 `${this.apiUrl}register/`,
-                {email, first_name: firstName, last_name: lastName, password},
-                {headers: new HttpHeaders({'Content-Type': 'application/json'}), withCredentials: true}
+                { email, first_name: firstName, last_name: lastName, password },
+                { headers: new HttpHeaders({ 'Content-Type': 'application/json' }), withCredentials: true }
             )
             .pipe(
                 switchMap(() => this.getCurrentUser()),
+                tap((user) => {
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                }),
                 filter(isUser)
             );
     }
 
     logout(): Observable<any> {
-        return this.http.post(`${this.apiUrl}logout/`, {}, {withCredentials: true}).pipe(
+        return this.http.post(`${this.apiUrl}logout/`, {}, { withCredentials: true }).pipe(
             tap(() => {
                 this.currentUserSubject.next(null);
                 localStorage.removeItem('user');
@@ -63,11 +94,11 @@ export class AuthService {
     }
 
     refresh(): Observable<any> {
-        return this.http.post(`${this.apiUrl}refresh-token/`, {}, {withCredentials: true});
+        return this.http.post(`${this.apiUrl}refresh-token/`, {}, { withCredentials: true });
     }
 
     getCurrentUser(): Observable<User | null> {
-        return this.http.get<User>(`${this.apiUrl}me/`, {withCredentials: true}).pipe(
+        return this.http.get<User>(`${this.apiUrl}me/`, { withCredentials: true }).pipe(
             tap((user) => this.currentUserSubject.next(user)),
             catchError(() => {
                 this.currentUserSubject.next(null);

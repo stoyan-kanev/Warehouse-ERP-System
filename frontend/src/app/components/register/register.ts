@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NgIf} from '@angular/common';
 import {strictEmailValidator} from '../../core/email-validator';
 import {passwordMatchValidator} from '../../core/password-match-validator';
 import {AuthService} from '../../services/auth-service';
@@ -11,7 +10,6 @@ import {passwordStrengthValidator} from '../../core/password-strength-validator'
     selector: 'app-register',
     imports: [
         ReactiveFormsModule,
-        NgIf
     ],
     templateUrl: './register.html',
     styleUrl: './register.css',

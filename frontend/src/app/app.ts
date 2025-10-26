@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import {Nav} from './components/nav/nav';
+import {AuthService} from './services/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,9 @@ import {Nav} from './components/nav/nav';
   styleUrl: './app.css'
 })
 export class AppComponent {
-  protected readonly title = signal('frontend');
+    constructor(private authService: AuthService) {}
+
+    ngOnInit(): void {
+        this.authService.initUserSession();
+    }
 }
