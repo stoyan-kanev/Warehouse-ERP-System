@@ -1,1 +1,54 @@
-<p>login works!</p>
+<div class="form_wrapper">
+    <form class="register_form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <h1 class="form_title">Login</h1>
+
+        <div class="form_group">
+            <label>Email</label>
+            <input
+                type="email"
+                formControlName="email"
+                [class.invalid]="f['email'].touched && f['email'].invalid"
+            />
+
+            @if (f['email'].touched && f['email'].invalid) {
+                <div class="error">
+                    @if (f['email'].errors?.['required']) {
+                        <small>Email is required</small>
+                    }
+                    @if (f['email'].errors?.['invalidEmail']) {
+                        <small>Please enter a valid email</small>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="form_group">
+            <label>Password</label>
+            <input
+                type="password"
+                formControlName="password"
+                [class.invalid]="f['password'].touched && f['password'].invalid"
+            />
+
+            @if (f['password'].touched && f['password'].invalid) {
+                <div class="error">
+                    @if (f['password'].errors?.['required']) {
+                        <small>Password is required</small>
+                    }
+                    @if (f['password'].errors?.['minlength']) {
+                        <small>Password must be at least 6 characters</small>
+                    }
+                </div>
+            }
+        </div>
+
+
+        <button
+            class="submit_btn"
+            type="submit"
+            [disabled]="form.invalid"
+        >
+            Logins
+        </button>
+    </form>
+</div>

@@ -31,11 +31,10 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ("id", "email", "first_name","last_name", "password", "password2")
+        fields = ("id", "email", "first_name","last_name", "password")
 
         extra_kwargs = {
             "email": {"required": True},
@@ -46,17 +45,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email is already registered.")
         return value
 
-    def validate(self, attrs):
-        if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError({"password": "Passwords do not match."})
-
-        validate_password(attrs["password"])
-
-        return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        validated_data.pop("password2")
 
         user = User(**validated_data)
         user.set_password(password)
