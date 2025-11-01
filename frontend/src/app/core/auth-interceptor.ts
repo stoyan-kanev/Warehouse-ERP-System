@@ -9,14 +9,16 @@ import { Router } from '@angular/router';
 import { switchMap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// бекенд ендпойнт за refresh
 const REFRESH_URL = `${environment.apiUrl}/users/refresh/`;
 const LOGIN_ROUTE = '/login';
 
-function prepareRequest(req: HttpRequest<unknown>) {
-    const isRelative = req.url.startsWith('/');
+const FRONTEND_SKIP_ROUTES = ['/', '/login', '/register'];
 
-    const finalUrl = isRelative
+function prepareRequest(req: HttpRequest<unknown>) {
+    const isApiRelative =
+        req.url.startsWith('/users/') ||
+        req.url.startsWith('/api/'); //
+    const finalUrl = isApiRelative
         ? `${environment.apiUrl}${req.url}`
         : req.url;
 
@@ -39,6 +41,11 @@ function callRefresh(next: HttpHandlerFn) {
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const router = inject(Router);
+
+    const currentRoute = router.url;
+    if (FRONTEND_SKIP_ROUTES.includes(currentRoute)) {
+        return next(req);
+    }
 
     const authReq = prepareRequest(req);
 
