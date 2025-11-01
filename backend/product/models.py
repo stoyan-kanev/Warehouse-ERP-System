@@ -1,12 +1,12 @@
 from django.db import models
 import django_filters as df
-
+from django.db.models.functions import Lower
 
 
 # Create your models here.
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
-    sku = models.CharField(max_length=100,unique=True,db_index=True)
+    sku = models.CharField(max_length=100,db_index=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     unit = models.CharField(max_length=100)
@@ -22,6 +22,9 @@ class Product(models.Model):
         db_table = 'product'
         ordering = ['-created_at']
         verbose_name_plural = 'products'
+        constraints = [
+            models.UniqueConstraint(Lower('sku'), name='uniq_product_sku_ci')
+        ]
 
 
 class ProductFilter(df.FilterSet):
