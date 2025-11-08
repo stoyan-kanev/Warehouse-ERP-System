@@ -4,13 +4,13 @@ import {AuthService} from '../../services/auth-service';
 import {AsyncPipe} from '@angular/common';
 
 @Component({
-  selector: 'app-nav',
+    selector: 'app-nav',
     imports: [
         RouterLink,
-        AsyncPipe
+        AsyncPipe,
     ],
-  templateUrl: './nav.html',
-  styleUrl: './nav.css',
+    templateUrl: './nav.html',
+    styleUrl: './nav.css',
 })
 export class Nav {
     user$;
@@ -18,6 +18,8 @@ export class Nav {
     constructor(private authService: AuthService, private router: Router) {
         this.user$ = this.authService.currentUser$;
     }
+
+
 
 
     logout(): void {

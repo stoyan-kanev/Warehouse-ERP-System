@@ -1,0 +1,35 @@
+<div class="dialog_wrapper">
+    <h2 class="dialog_title">Add Product</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        <div>
+            <label for="name">Name *</label>
+            <input id="name" type="text" formControlName="name" />
+        </div>
+
+        <div>
+            <label for="sku">SKU</label>
+            <input id="sku" type="text" formControlName="sku" />
+        </div>
+
+        <div>
+            <label for="price">Price *</label>
+            <input id="price" type="number" formControlName="price" />
+        </div>
+
+        <div>
+            <label for="description">Description</label>
+            <textarea id="description" rows="3" formControlName="description"></textarea>
+        </div>
+
+        <div>
+            <label for="category">Category</label>
+            <input id="category" type="text" formControlName="category" />
+        </div>
+
+        <div class="actions">
+            <button type="button" class="cancel" (click)="onCancel()">Cancel</button>
+            <button type="submit" [disabled]="form.invalid">Save</button>
+        </div>
+    </form>
+</div>

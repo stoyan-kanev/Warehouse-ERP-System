@@ -34,3 +34,10 @@
 .user-info{
     margin-right: 20px;
 }
+.right_options{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+
+}

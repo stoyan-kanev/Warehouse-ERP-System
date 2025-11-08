@@ -1,7 +1,17 @@
 <nav class="nav_wrapper">
     <h1><a routerLink="/">🏠 Home</a></h1>
-    <div>
+    @if (user$ | async; as user) {
+        <div class="nav_list">
+            <a routerLink="/product-list">Products</a>
+
+        </div>
+    }
+
+
+
+    <div class="right_options">
         @if (user$ | async; as user) {
+
             <span class="user-info">👤 {{ user.first_name }} {{ user.last_name }}</span>
             <button (click)="logout()">Logout</button>
         } @else {

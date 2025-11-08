@@ -1,0 +1,21 @@
+<div class="toolbar">
+    <button mat-flat-button color="primary" (click)="openAddProductDialog()">
+        + Create Product
+    </button>
+</div>
+
+<table>
+    @for (p of products; track p.id) {
+        <tr>
+            <td>{{ p.sku }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.price_sell }}</td>
+        </tr>
+    }
+</table>
+
+<div class="pagination">
+    <button (click)="loadProducts(currentPage - 1)" [disabled]="!pagination.previous">Prev</button>
+    <span>Total: {{ pagination.count }}</span>
+    <button (click)="loadProducts(currentPage + 1)" [disabled]="!pagination.next">Next</button>
+</div>
