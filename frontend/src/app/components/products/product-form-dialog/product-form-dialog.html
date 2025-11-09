@@ -1,35 +1,51 @@
-<div class="dialog_wrapper">
-    <h2 class="dialog_title">Add Product</h2>
+<div class="form-wrapper">
+    <h2 class="title">Add Product</h2>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <div>
+
+        <div class="field">
+            <label for="sku">SKU *</label>
+            <input id="sku" type="text" formControlName="sku" />
+        </div>
+
+        <div class="field">
             <label for="name">Name *</label>
             <input id="name" type="text" formControlName="name" />
         </div>
 
-        <div>
-            <label for="sku">SKU</label>
-            <input id="sku" type="text" formControlName="sku" />
-        </div>
-
-        <div>
-            <label for="price">Price *</label>
-            <input id="price" type="number" formControlName="price" />
-        </div>
-
-        <div>
+        <div class="field">
             <label for="description">Description</label>
             <textarea id="description" rows="3" formControlName="description"></textarea>
         </div>
 
-        <div>
-            <label for="category">Category</label>
-            <input id="category" type="text" formControlName="category" />
+        <div class="field">
+            <label for="unit">Unit *</label>
+            <input id="unit" type="text" placeholder="e.g. pcs, kg, box..." formControlName="unit" />
+        </div>
+
+        <div class="field">
+            <label for="min_stock_level">Min Stock Level *</label>
+            <input id="min_stock_level" type="number" formControlName="min_stock_level" />
+        </div>
+
+        <div class="field">
+            <label for="price_sell">Price (Sell) *</label>
+            <input id="price_sell" type="number" step="0.01" formControlName="price_sell" />
+        </div>
+
+        <div class="field">
+            <label for="price_buy">Price (Buy) *</label>
+            <input id="price_buy" type="number" step="0.01" formControlName="price_buy" />
+        </div>
+
+        <div class="checkbox-row">
+            <input id="is_active" type="checkbox" formControlName="is_active" />
+            <label for="is_active">Active Product</label>
         </div>
 
         <div class="actions">
-            <button type="button" class="cancel" (click)="onCancel()">Cancel</button>
-            <button type="submit" [disabled]="form.invalid">Save</button>
+            <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
+            <button type="submit" class="btn primary" [disabled]="form.invalid">Save</button>
         </div>
     </form>
 </div>

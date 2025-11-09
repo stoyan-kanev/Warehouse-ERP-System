@@ -6,7 +6,7 @@ import {Observable, tap} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-    private apiUrl = `${environment.apiUrl}/api/v1/products/`;
+    private apiUrl = `${environment.apiUrl}/api/v1/products`;
     private apiUrlProductList = `${environment.apiUrl}/api/v1/products-list`
 
     private _products: Product[] = [];

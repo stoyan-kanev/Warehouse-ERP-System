@@ -23,11 +23,14 @@ export class ProductFormDialogComponent implements OnInit {
 
     ngOnInit() {
         this.form = this.fb.group({
+            sku: ['', Validators.required],
             name: ['', Validators.required],
-            sku: [''],
-            price: [0, [Validators.required, Validators.min(0)]],
             description: [''],
-            category: [''],
+            unit: ['', Validators.required],
+            min_stock_level: [0, [Validators.required, Validators.min(0)]],
+            price_sell: [0, [Validators.required, Validators.min(0)]],
+            price_buy: [0, [Validators.required, Validators.min(0)]],
+            is_active: [true]
         });
     }
 
@@ -36,7 +39,7 @@ export class ProductFormDialogComponent implements OnInit {
 
         this.productService.createProduct(this.form.value).subscribe({
             next: () => this.dialogRef.close('refresh'),
-            error: (err) => console.error(err),
+            error: err => console.error('Error creating product:', err)
         });
     }
 

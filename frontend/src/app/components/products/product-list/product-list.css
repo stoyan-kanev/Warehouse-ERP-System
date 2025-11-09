@@ -10,3 +10,19 @@
     align-items: center;
     margin-top: 15px;
 }
+.create-btn {
+    background-color: #3b82f6 !important; /* твоят син цвят */
+    color: white !important;
+    border-radius: 9px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    margin-right: 1%;
+}
+
+.create-btn:hover {
+    background-color: #2563eb !important; /* по-тъмен нюанс при hover */
+}
+
+.create-btn:active {
+    background-color: #1d4ed8 !important;
+}
