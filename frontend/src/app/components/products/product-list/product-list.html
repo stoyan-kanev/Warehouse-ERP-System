@@ -1,25 +1,47 @@
-<div class="toolbar">
-    <button
-        mat-flat-button
-        class="create-btn"
-        (click)="openAddProductDialog()"
-    >
-        + Create Product
-    </button>
-</div>
+<div class="products-page">
+    <div class="toolbar">
+        <button
+            mat-flat-button
+            class="create-btn"
+            (click)="openAddProductDialog()"
+        >
+            + Create Product
+        </button>
+    </div>
 
-<table>
-    @for (p of products; track p.id) {
-        <tr>
-            <td>{{ p.sku }}</td>
-            <td>{{ p.name }}</td>
-            <td>{{ p.price_sell }}</td>
-        </tr>
-    }
-</table>
+    <div class="products-grid">
+        @for (p of products; track p.id) {
+            <div class="product-card">
+                <div class="product-sku">{{ p.sku }}</div>
+                <div class="product-name">{{ p.name }}</div>
+                <div class="product-price">
+                    {{ p.price_sell | number:'1.2-2' }} <span class="currency">лв</span>
+                </div>
+                <div class="product-meta">
+                    <span>Min stock: {{ p.min_stock_level }}</span>
+                    <span>Unit: {{ p.unit }}</span>
+                </div>
+            </div>
+        }
+    </div>
 
-<div class="pagination">
-    <button (click)="loadProducts(currentPage - 1)" [disabled]="!pagination.previous">Prev</button>
-    <span>Total: {{ pagination.count }}</span>
-    <button (click)="loadProducts(currentPage + 1)" [disabled]="!pagination.next">Next</button>
+    <div class="pagination-footer">
+        <button
+            class="nav-btn"
+            (click)="loadProducts(currentPage - 1)"
+            [disabled]="!pagination.previous"
+        >
+            Prev
+        </button>
+
+        <span class="total">Total: {{ pagination.count }}</span>
+
+        <button
+            class="nav-btn"
+            (click)="loadProducts(currentPage + 1)"
+            [disabled]="!pagination.next"
+        >
+            Next
+        </button>
+    </div>
 </div>

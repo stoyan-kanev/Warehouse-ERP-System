@@ -4,11 +4,13 @@ import {Product} from '../product.types';
 import {MatButton} from '@angular/material/button';
 import {ProductFormDialogComponent} from '../product-form-dialog/product-form-dialog';
 import {MatDialog} from '@angular/material/dialog';
+import {DecimalPipe} from '@angular/common';
 
 @Component({
     selector: 'app-product-list',
     imports: [
-        MatButton
+        MatButton,
+        DecimalPipe
     ],
     templateUrl: './product-list.html',
     styleUrl: './product-list.css',
