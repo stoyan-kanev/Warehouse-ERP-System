@@ -15,7 +15,7 @@ class ProductListView(ListAPIView):
     filterset_class = ProductFilter
     search_fields = ["name", "sku", "description", "unit"]
     ordering_fields = ["name", "price_sell", "created_at"]
-    ordering = ["-created_at"]
+    ordering = ["id"]
 
 
 class ManageProductView(APIView):

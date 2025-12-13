@@ -27,7 +27,7 @@
 }
 .create-btn:hover {
     background-color: #486a38 !important;
-    
+
 }
 
 .products-grid {
@@ -77,6 +77,10 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
     align-items: center;
     justify-content: space-between;
+}
+.product-card.non-active {
+    background-color: #664f4f;
+
 }
 .product-card:hover {
     border-color: var(--accent);

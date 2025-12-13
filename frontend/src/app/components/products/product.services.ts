@@ -46,5 +46,10 @@ export class ProductService {
             withCredentials: true,
         });
     }
+    deleteProduct(id: number) {
+        return this.http.delete(`${this.apiUrl}/${id}`, {
+            withCredentials: true,
+        },)
+    }
 
 }

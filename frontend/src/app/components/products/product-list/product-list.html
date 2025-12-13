@@ -11,7 +11,8 @@
 
     <div class="products-grid">
         @for (p of products; track p.id) {
-            <div class="product-card">
+
+            <div class="product-card" [class.non-active]="!p.is_active">
                 <div>
                     <div class="product-sku">{{ p.sku }}</div>
                     <div class="product-name">{{ p.name }}</div>

@@ -186,11 +186,11 @@
 }
 
 .btn.primary {
-    background: var(--accent);
+    background: green;
     color: #fff;
 }
 .btn.primary:hover:not(:disabled) {
-    background: var(--accent-hover);
+    background: darkgreen;
 }
 .btn.primary:disabled {
     opacity: 0.55;
@@ -199,20 +199,20 @@
 
 .btn.ghost {
     background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
+    color: #9CA3AFFF;
+    border: 1px solid #F7F7FBFF;
 }
 .btn.ghost:hover {
-    background: var(--panel-2);
+    background: #0F172AFF;
     color: var(--text);
 }
 
 .btn.danger {
-    background: var(--danger);
+    background: red;
     color: #fff;
 }
 .btn.danger:hover {
-    background: var(--danger-hover);
+    background: darkred;
 }
 
 /* responsive */

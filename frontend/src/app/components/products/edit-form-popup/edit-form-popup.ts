@@ -12,7 +12,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 })
 export class EditFormPopup implements OnInit {
     form!: FormGroup;
-
+    isDelete = false;
     constructor(
         private formBuilder: FormBuilder,
         private productService: ProductService,
@@ -56,5 +56,15 @@ export class EditFormPopup implements OnInit {
 
     onCancel() {
         this.dialogRef.close();
+    }
+
+    onDelete() {
+        this.isDelete = confirm('Are you sure?',);
+        if (this.isDelete) {
+            this.productService.deleteProduct(this.data.id).subscribe({
+                next: () => this.dialogRef.close('refresh'),
+                error: (err) => console.error('Error deleting product:', err),
+            })
+        }
     }
 }
