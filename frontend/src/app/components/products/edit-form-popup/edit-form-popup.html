@@ -1,0 +1,95 @@
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <h2 class="dialog__title">Edit Product</h2>
+            <p class="dialog__subtitle">Update product details and save changes.</p>
+        </div>
+
+        <!-- ако искаш close X бутон -->
+        <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">
+            ✕
+        </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        <!-- Основни данни -->
+        <div class="section">
+            <div class="section__title">General</div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label for="sku">SKU *</label>
+                    <input id="sku" type="text" formControlName="sku" placeholder="SKU-1001" />
+                    <!-- placeholder за грешки -->
+                    <!-- <div class="error">SKU is required</div> -->
+                </div>
+
+                <div class="field">
+                    <label for="name">Name *</label>
+                    <input id="name" type="text" formControlName="name" placeholder="USB Mouse" />
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="description">Description</label>
+                <textarea
+                    id="description"
+                    rows="3"
+                    formControlName="description"
+                    placeholder="Short description..."
+                ></textarea>
+            </div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label for="unit">Unit *</label>
+                    <input id="unit" type="text" formControlName="unit" placeholder="pcs / kg / box" />
+                </div>
+
+                <div class="field">
+                    <label for="min_stock_level">Min Stock Level *</label>
+                    <input id="min_stock_level" type="number" formControlName="min_stock_level" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Цени -->
+        <div class="section">
+            <div class="section__title">Pricing</div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label for="price_sell">Price (Sell) *</label>
+                    <input id="price_sell" type="number" step="0.01" formControlName="price_sell" />
+                </div>
+
+                <div class="field">
+                    <label for="price_buy">Price (Buy) *</label>
+                    <input id="price_buy" type="number" step="0.01" formControlName="price_buy" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Статус -->
+        <div class="section">
+            <div class="section__title">Status</div>
+
+            <div class="checkbox">
+                <input id="is_active" type="checkbox" formControlName="is_active" />
+                <label for="is_active">Active product</label>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
+
+            <!-- опционално: бутон за delete, ако решиш -->
+            <!-- <button type="button" class="btn danger" (click)="onDelete()">Delete</button> -->
+
+            <button type="submit" class="btn primary" [disabled]="form.invalid">
+                Save changes
+            </button>
+        </div>
+    </form>
+</div>

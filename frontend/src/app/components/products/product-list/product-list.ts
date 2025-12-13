@@ -1,25 +1,25 @@
-import {Component, OnInit} from '@angular/core';
-import {ProductService} from '../product.services';
-import {Product} from '../product.types';
-import {MatButton} from '@angular/material/button';
-import {ProductFormDialogComponent} from '../product-form-dialog/product-form-dialog';
-import {MatDialog} from '@angular/material/dialog';
-import {DecimalPipe} from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { ProductService } from '../product.services';
+import { Product } from '../product.types';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButton } from '@angular/material/button';
+import { DecimalPipe } from '@angular/common';
+import { ProductFormDialogComponent } from '../product-form-dialog/product-form-dialog';
+import { EditFormPopup } from '../edit-form-popup/edit-form-popup';
 
 @Component({
     selector: 'app-product-list',
+    standalone: true,
     imports: [
         MatButton,
-        DecimalPipe
+        DecimalPipe,
+        MatDialogModule
     ],
     templateUrl: './product-list.html',
     styleUrl: './product-list.css',
 })
 export class ProductList implements OnInit {
-
-
     currentPage = 1;
-
 
     get products(): Product[] {
         return this.productService.products;
@@ -29,7 +29,10 @@ export class ProductList implements OnInit {
         return this.productService.pagination;
     }
 
-    constructor(private productService: ProductService,private dialog: MatDialog) {}
+    constructor(
+        private productService: ProductService,
+        private dialog: MatDialog
+    ) {}
 
     ngOnInit() {
         this.loadProducts();
@@ -43,27 +46,31 @@ export class ProductList implements OnInit {
         });
     }
 
-    goPrev() {
-        if (this.pagination.previous) {
-            this.loadProducts(this.currentPage - 1);
-        }
-    }
-
-    goNext() {
-        if (this.pagination.next) {
-            this.loadProducts(this.currentPage + 1);
-        }
-    }
-
     openAddProductDialog() {
         const dialogRef = this.dialog.open(ProductFormDialogComponent, {
-            width: '400px',
+            width: '420px',
             panelClass: 'product-dialog-panel'
         });
 
         dialogRef.afterClosed().subscribe((result: 'refresh' | undefined) => {
             if (result === 'refresh') {
-                this.loadProducts();
+                this.loadProducts(this.currentPage);
+            }
+        });
+    }
+
+    openEditDialog(product: Product) {
+        const dialogRef = this.dialog.open(EditFormPopup, {
+            width: '720px',
+            maxWidth: '92vw',
+            maxHeight: '90vh',
+            panelClass: 'erp-dialog',
+            data: product
+        });
+
+        dialogRef.afterClosed().subscribe((result: 'refresh' | undefined) => {
+            if (result === 'refresh') {
+                this.loadProducts(this.currentPage);
             }
         });
     }

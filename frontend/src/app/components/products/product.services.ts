@@ -41,4 +41,10 @@ export class ProductService {
             withCredentials: true,
         });
     }
+    editProduct(id: number,data: any,) {
+        return this.http.put(`${this.apiUrl}/${id}`, data, {
+            withCredentials: true,
+        });
+    }
+
 }
