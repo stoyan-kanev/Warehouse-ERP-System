@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Product
 
 class ProductSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
@@ -24,3 +25,10 @@ class ProductSerializer(serializers.ModelSerializer):
         if 'sku' in validated_data and validated_data['sku'] is not None:
             validated_data['sku'] = validated_data['sku'].strip().upper()
         return super().update(instance, validated_data)
+
+    def get_image_url(self, obj):
+        request = self.context.get("request")
+        if not obj.image:
+            return None
+        url = obj.image.url
+        return request.build_absolute_uri(url) if request else url

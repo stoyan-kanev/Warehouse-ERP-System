@@ -10,10 +10,14 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     unit = models.CharField(max_length=100)
+    quantity = models.IntegerField(default=0)
     min_stock_level = models.IntegerField()
     price_sell = models.FloatField()
     price_buy = models.FloatField()
     is_active = models.BooleanField(default=True)
+
+    image = models.ImageField(upload_to="products/%Y/%m/%d/", blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

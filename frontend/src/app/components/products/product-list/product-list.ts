@@ -3,7 +3,7 @@ import { ProductService } from '../product.services';
 import { Product } from '../product.types';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButton } from '@angular/material/button';
-import { DecimalPipe } from '@angular/common';
+import {DecimalPipe, NgIf} from '@angular/common';
 import { ProductFormDialogComponent } from '../product-form-dialog/product-form-dialog';
 import { EditFormPopup } from '../edit-form-popup/edit-form-popup';
 
@@ -13,7 +13,8 @@ import { EditFormPopup } from '../edit-form-popup/edit-form-popup';
     imports: [
         MatButton,
         DecimalPipe,
-        MatDialogModule
+        MatDialogModule,
+        NgIf
     ],
     templateUrl: './product-list.html',
     styleUrl: './product-list.css',

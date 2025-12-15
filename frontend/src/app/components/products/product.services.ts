@@ -36,15 +36,13 @@ export class ProductService {
             );
     }
 
-    createProduct(data: any) {
+    createProduct(data: FormData) {
         return this.http.post(`${this.apiUrl}/create`, data, {
             withCredentials: true,
         });
     }
-    editProduct(id: number,data: any,) {
-        return this.http.put(`${this.apiUrl}/${id}`, data, {
-            withCredentials: true,
-        });
+    editProduct(id: number, fd: FormData) {
+        return this.http.put(`${this.apiUrl}/${id}`, fd, { withCredentials: true });
     }
     deleteProduct(id: number) {
         return this.http.delete(`${this.apiUrl}/${id}`, {

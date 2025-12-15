@@ -13,7 +13,19 @@
         @for (p of products; track p.id) {
 
             <div class="product-card" [class.non-active]="!p.is_active">
-                <div>
+                <div class="product-thumb">
+                    <img
+                        *ngIf="p.image_url; else noImg"
+                        [src]="p.image_url"
+                        [alt]="p.name"
+                        loading="lazy"
+                    />
+                    <ng-template #noImg>
+                        <div class="thumb-placeholder">No image</div>
+                    </ng-template>
+                </div>
+
+                <div class="product-content">
                     <div class="product-sku">{{ p.sku }}</div>
                     <div class="product-name">{{ p.name }}</div>
 
@@ -23,17 +35,14 @@
                     </div>
 
                     <div class="product-meta">
-                        <span>Min stock: {{ p.min_stock_level }}</span>
+                        <span>Quantity: {{ p.quantity }}</span>
                         <span>Unit: {{ p.unit }}</span>
                     </div>
-                </div>
 
+
+                </div>
                 <div class="card-actions">
-                    <button
-                        mat-stroked-button
-                        color="primary"
-                        (click)="openEditDialog(p)"
-                    >
+                    <button mat-stroked-button color="primary" (click)="openEditDialog(p)">
                         Edit
                     </button>
                 </div>

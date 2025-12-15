@@ -39,8 +39,23 @@
                     placeholder="Short description..."
                 ></textarea>
             </div>
-
+            <div class="field">
+                <label for="image">Product Image</label>
+                <input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                />
+                <!-- (по желание) показваш името -->
+                <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
+            </div>
             <div class="grid grid--2">
+                <div class="field">
+                    <label for="quantity">Quantity *</label>
+                    <input id="quantity" type="number" formControlName="quantity" />
+                </div>
+
                 <div class="field">
                     <label for="unit">Unit *</label>
                     <input id="unit" type="text" formControlName="unit" placeholder="pcs / kg / box" />
