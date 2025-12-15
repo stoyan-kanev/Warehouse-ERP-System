@@ -94,7 +94,7 @@ export class AuthService {
     }
 
     refresh(): Observable<any> {
-        return this.http.post(`${this.apiUrl}refresh-token/`, {}, { withCredentials: true });
+        return this.http.post(`${this.apiUrl}refresh/`, {}, { withCredentials: true });
     }
 
     getCurrentUser(): Observable<User | null> {
