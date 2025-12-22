@@ -69,33 +69,60 @@
     border-radius: var(--radius);
     border: 1px solid var(--border-card);
     padding: 10px 12px;
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
     color: var(--text-main);
     box-sizing: border-box;
     transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
-    align-items: center;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-.product-card.non-active {
-    background-color: #664f4f;
 
+    /* FIX */
+    display: flex;
+    flex-direction: column;     /* button stays bottom */
+    gap: 10px;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;          /* махаме wrap */
 }
+
+.product-wrap{
+    /* FIX */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;                  /* вместо 3rem */
+    width: 100%;
+    min-width: 0;
+}
+
+.product-content{
+    /* FIX */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;      /* за да стои текста вдясно като на screenshot */
+    text-align: right;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+/* за да не разпъва колоната при дълги имена */
+.product-name,
+.product-sku{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .card-actions {
     width: 100%;
 }
+
 .edit-btn{
     width: 100%;
-    transition: 0.3s ease-in-out;
-
 }
-.edit-btn:hover {
-    background-color: #175f75;
-    transition: 0.2s ease-in-out;
+.product-wrap{
+    display: flex;
+    align-items: center;
 }
-
 /*This is for card transformation on hover*/
 /*.product-card:hover {*/
 /*    border-color: var(--accent);*/
@@ -116,6 +143,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 
 .product-thumb img {

@@ -13,34 +13,37 @@
         @for (p of products; track p.id) {
 
             <div class="product-card" [class.non-active]="!p.is_active">
-                <div class="product-thumb">
-                    <img
-                        *ngIf="p.image_url; else noImg"
-                        [src]="p.image_url"
-                        [alt]="p.name"
-                        loading="lazy"
-                    />
-                    <ng-template #noImg>
-                        <div class="thumb-placeholder">No image</div>
-                    </ng-template>
-                </div>
-
-                <div class="product-content">
-                    <div class="product-sku">{{ p.sku }}</div>
-                    <div class="product-name">{{ p.name }}</div>
-
-                    <div class="product-price">
-                        {{ p.price_sell | number:'1.2-2' }}
-                        <span class="currency">лв</span>
+                <div class="product-wrap">
+                    <div class="product-thumb">
+                        <img
+                            *ngIf="p.image_url; else noImg"
+                            [src]="p.image_url"
+                            [alt]="p.name"
+                            loading="lazy"
+                        />
+                        <ng-template #noImg>
+                            <div class="thumb-placeholder">No image</div>
+                        </ng-template>
                     </div>
 
-                    <div class="product-meta">
-                        <span>Quantity: {{ p.quantity }}</span>
-                        <span>Unit: {{ p.unit }}</span>
+                    <div class="product-content">
+                        <div class="product-sku">{{ p.sku }}</div>
+                        <div class="product-name">{{ p.name }}</div>
+
+                        <div class="product-price">
+                            {{ p.price_sell | number:'1.2-2' }}
+                            <span class="currency">лв</span>
+                        </div>
+
+                        <div class="product-meta">
+                            <span>Quantity: {{ p.quantity }}</span>
+                            <span>Unit: {{ p.unit }}</span>
+                        </div>
+
+
                     </div>
-
-
                 </div>
+
                 <div class="card-actions">
                     <button class="edit-btn" mat-stroked-button color="primary" (click)="openEditDialog(p)">
                         Edit
