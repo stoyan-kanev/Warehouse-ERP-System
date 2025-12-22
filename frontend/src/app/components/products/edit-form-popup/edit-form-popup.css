@@ -14,7 +14,7 @@
 
 /* контейнер на попъпа */
 .dialog {
-    width: min(720px, 92vw);
+    /*width: min(720px, 92vw);*/
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: var(--radius);
