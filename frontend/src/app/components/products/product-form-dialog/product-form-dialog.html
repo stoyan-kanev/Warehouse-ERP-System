@@ -1,8 +1,17 @@
-<div class="form-wrapper">
-    <h2 class="title">Add Product</h2>
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <h2 class="dialog__title">Add Product</h2>
+            <p class="dialog__subtitle">Create a new product and save it to the catalog.</p>
+        </div>
+
+        <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">
+            ✕
+        </button>
+    </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <!-- Основни данни -->
+        <!-- General -->
         <div class="section">
             <div class="section__title">General</div>
 
@@ -10,8 +19,6 @@
                 <div class="field">
                     <label for="sku">SKU *</label>
                     <input id="sku" type="text" formControlName="sku" placeholder="SKU-1001" />
-                    <!-- placeholder за грешки -->
-                    <!-- <div class="error">SKU is required</div> -->
                 </div>
 
                 <div class="field">
@@ -22,24 +29,15 @@
 
             <div class="field">
                 <label for="description">Description</label>
-                <textarea
-                    id="description"
-                    rows="3"
-                    formControlName="description"
-                    placeholder="Short description..."
-                ></textarea>
+                <textarea id="description" rows="3" formControlName="description" placeholder="Short description..."></textarea>
             </div>
+
             <div class="field">
                 <label for="image">Product Image</label>
-                <input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    (change)="onFileSelected($event)"
-                />
-                <!-- (по желание) показваш името -->
+                <input id="image" type="file" accept="image/*" (change)="onFileSelected($event)" />
                 <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
             </div>
+
             <div class="grid grid--2">
                 <div class="field">
                     <label for="quantity">Quantity *</label>
@@ -58,7 +56,7 @@
             </div>
         </div>
 
-        <!-- Цени -->
+        <!-- Pricing -->
         <div class="section">
             <div class="section__title">Pricing</div>
 
@@ -75,7 +73,7 @@
             </div>
         </div>
 
-        <!-- Статус -->
+        <!-- Status -->
         <div class="section">
             <div class="section__title">Status</div>
 
@@ -88,13 +86,7 @@
         <!-- Actions -->
         <div class="actions">
             <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
-
-            <!-- опционално: бутон за delete, ако решиш -->
-
-
-            <button type="submit" class="btn primary" [disabled]="form.invalid">
-                Save changes
-            </button>
+            <button type="submit" class="btn primary" [disabled]="form.invalid">Save changes</button>
         </div>
     </form>
 </div>

@@ -35,9 +35,9 @@ export class ProductFormDialogComponent implements OnInit {
             description: [''],
             quantity: ['', Validators.required],
             unit: ['', Validators.required],
-            min_stock_level: [0, [Validators.required, Validators.min(0)]],
-            price_sell: [0, [Validators.required, Validators.min(0)]],
-            price_buy: [0, [Validators.required, Validators.min(0)]],
+            min_stock_level: [[Validators.required, Validators.min(0)]],
+            price_sell: [ [Validators.required, Validators.min(0)]],
+            price_buy: [ [Validators.required, Validators.min(0)]],
             is_active: [true]
         });
     }
