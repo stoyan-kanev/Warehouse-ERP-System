@@ -33,8 +33,8 @@ function prepareRequest(req: HttpRequest<unknown>) {
 }
 
 function callRefresh(next: HttpHandlerFn) {
-    const refreshReq = new HttpRequest('POST', REFRESH_PATH, {});
-    return next(prepareRequest(refreshReq));
+    const refreshReq = new HttpRequest('POST', REFRESH_URL, {}, { withCredentials: true });
+    return next(refreshReq);
 }
 
 function shouldSkipAuthHandling(url: string) {

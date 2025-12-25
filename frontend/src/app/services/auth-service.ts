@@ -35,15 +35,11 @@ export class AuthService {
 
         // Проверка от бекенда дали има активна сесия (cookie)
         this.getCurrentUser().subscribe({
-            next: (user) => {
-                if (user) {
-                    localStorage.setItem('user', JSON.stringify(user));
-                } else {
-                    localStorage.removeItem('user');
-                }
-            },
-            error: () => {
+            next: (user) => localStorage.setItem('user', JSON.stringify(user)),
+            error: (err) => {
+                console.log('getCurrentUser failed:', err.status, err.error);
                 localStorage.removeItem('user');
+                this.currentUserSubject.next(null);
             },
         });
     }
@@ -97,13 +93,9 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}refresh/`, {}, { withCredentials: true });
     }
 
-    getCurrentUser(): Observable<User | null> {
+    getCurrentUser(): Observable<User> {
         return this.http.get<User>(`${this.apiUrl}me/`, { withCredentials: true }).pipe(
-            tap((user) => this.currentUserSubject.next(user)),
-            catchError(() => {
-                this.currentUserSubject.next(null);
-                return of(null);
-            })
+            tap((user) => this.currentUserSubject.next(user))
         );
     }
 
