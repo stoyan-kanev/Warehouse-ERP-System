@@ -1,0 +1,110 @@
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <div class="dialog__title-row">
+                <h2 class="dialog__title">Product Details</h2>
+
+                <span class="pill" [class.pill--off]="!form?.value?.is_active">
+          {{ form?.value?.is_active ? 'Active' : 'Inactive' }}
+        </span>
+            </div>
+
+            <p class="dialog__subtitle">View product information.</p>
+        </div>
+
+        <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">✕</button>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="$event.preventDefault()">
+        <!-- GENERAL + IMAGE (ЕДИН section) -->
+        <div class="section">
+            <div class="section__title">General</div>
+
+            <div class="general-layout">
+                <!-- LEFT: IMAGE -->
+                <div class="general-layout__image">
+                    <label class="image-label">Product Image</label>
+
+                    <div class="image-preview">
+                        <img
+                            *ngIf="imagePreviewUrl; else noImg"
+                            [src]="imagePreviewUrl"
+                            alt="Product image"
+                        />
+                        <ng-template #noImg>
+                            <div class="image-placeholder">No image</div>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- RIGHT: GENERAL INFO -->
+                <div class="general-layout__content">
+                    <div class="grid grid--2">
+                        <div class="field">
+                            <label>SKU</label>
+                            <div class="value">{{ form.value.sku || '-' }}</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Name</label>
+                            <div class="value">{{ form.value.name || '-' }}</div>
+                        </div>
+
+                        <div class="field field--full">
+                            <label>Description</label>
+                            <div class="value value--multiline">
+                                {{ form.value.description || '-' }}
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Quantity</label>
+                            <div class="value">{{ form.value.quantity ?? '-' }}</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Unit</label>
+                            <div class="value">{{ form.value.unit || '-' }}</div>
+                        </div>
+
+                        <div class="field field--full">
+                            <label>Min Stock Quantity</label>
+                            <div class="value">{{ form.value.min_stock_level ?? '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRICING -->
+        <div class="section">
+            <div class="section__title">Pricing</div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label>Price (Sell)</label>
+                    <div class="value">{{ form.value.price_sell ?? '-' }}</div>
+                </div>
+
+                <div class="field">
+                    <label>Price (Buy)</label>
+                    <div class="value">{{ form.value.price_buy ?? '-' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATUS -->
+<!--        <div class="section">-->
+<!--            <div class="section__title">Status</div>-->
+
+<!--            <div class="value">-->
+<!--                {{ form.value.is_active ? 'Active product' : 'Inactive product' }}-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn ghost" (click)="onCancel()">Close</button>
+        </div>
+    </form>
+</div>

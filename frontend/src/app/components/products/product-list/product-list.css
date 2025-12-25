@@ -24,10 +24,12 @@
     padding: 0.5em 1.4em !important;
     font-weight: 500 !important;
     text-transform: none !important;
+    transition: ease-in-out 0.2s;
+
 }
 .create-btn:hover {
-    background-color: #486a38 !important;
-
+    background-color: #3c691f !important;
+    transition: ease-in-out 0.2s;
 }
 
 .products-grid {
@@ -114,8 +116,12 @@
 
 .card-actions {
     width: 100%;
+    gap: 12px;
+    display: flex
 }
-
+.non-active{
+    background-color: #58271f;
+}
 .edit-btn{
     width: 100%;
 }

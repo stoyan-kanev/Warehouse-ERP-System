@@ -12,7 +12,7 @@
     <div class="right_options">
         @if (user$ | async; as user) {
 
-            <span class="user-info">👤 {{ user.first_name }} {{ user.last_name }}</span>
+            <span class="user-info"><a routerLink="/profile">👤 {{ user.first_name }} {{ user.last_name }}</a></span>
             <button (click)="logout()">Logout</button>
         } @else {
             <div class="nav_list">

@@ -6,6 +6,7 @@ import { MatButton } from '@angular/material/button';
 import {DecimalPipe, NgIf} from '@angular/common';
 import { ProductFormDialogComponent } from '../product-form-dialog/product-form-dialog';
 import { EditFormPopup } from '../edit-form-popup/edit-form-popup';
+import {ProductDetails} from '../product-details/product-details';
 
 @Component({
     selector: 'app-product-list',
@@ -68,6 +69,22 @@ export class ProductList implements OnInit {
             maxWidth: '92vw',
             maxHeight: '90vh',
             panelClass: 'erp-dialog',
+            data: product
+        });
+
+        dialogRef.afterClosed().subscribe((result: 'refresh' | undefined) => {
+            if (result === 'refresh') {
+                this.loadProducts(this.currentPage);
+            }
+        });
+    }
+
+    openDetailDialog(product: Product) {
+        const dialogRef = this.dialog.open(ProductDetails, {
+            width: '1520px',
+            maxWidth: '92vw',
+            maxHeight: '95vh',
+            panelClass: 'erp-detail-dialog',
             data: product
         });
 
