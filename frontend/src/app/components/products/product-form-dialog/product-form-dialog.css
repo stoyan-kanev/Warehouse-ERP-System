@@ -24,7 +24,19 @@
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.60);
     box-sizing: border-box;
 }
-
+.danger{
+    background-color: red;
+}
+.danger:hover{
+    background-color: #741d1d;
+}
+.save{
+    background-color: green !important;
+    color:white !important ;
+}
+.save:hover{
+    background-color: #256b25 !important;
+}
 /* header */
 .dialog__header {
     display: flex;

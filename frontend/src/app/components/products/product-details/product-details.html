@@ -4,9 +4,13 @@
             <div class="dialog__title-row">
                 <h2 class="dialog__title">Product Details</h2>
 
-                <span class="pill" [class.pill--off]="!form?.value?.is_active">
-          {{ form?.value?.is_active ? 'Active' : 'Inactive' }}
-        </span>
+                <span
+                    class="pill"
+                    [class.pill--active]="form?.value?.is_active"
+                    [class.pill--inactive]="!form?.value?.is_active"
+                >
+                  {{ form?.value?.is_active ? 'Active' : 'Inactive' }}
+                </span>
             </div>
 
             <p class="dialog__subtitle">View product information.</p>
@@ -94,13 +98,13 @@
         </div>
 
         <!-- STATUS -->
-<!--        <div class="section">-->
-<!--            <div class="section__title">Status</div>-->
+        <!--        <div class="section">-->
+        <!--            <div class="section__title">Status</div>-->
 
-<!--            <div class="value">-->
-<!--                {{ form.value.is_active ? 'Active product' : 'Inactive product' }}-->
-<!--            </div>-->
-<!--        </div>-->
+        <!--            <div class="value">-->
+        <!--                {{ form.value.is_active ? 'Active product' : 'Inactive product' }}-->
+        <!--            </div>-->
+        <!--        </div>-->
 
         <!-- ACTIONS -->
         <div class="actions">

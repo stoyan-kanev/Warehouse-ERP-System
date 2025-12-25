@@ -78,9 +78,23 @@
     font-size: 0.75rem;
     padding: 4px 10px;
     border-radius: 999px;
-    border: 1px solid rgba(96, 165, 250, 0.35);
-    background: rgba(96, 165, 250, 0.10);
-    color: var(--accent-2);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid transparent;
+}
+
+/* ACTIVE */
+.pill--active {
+    background: rgba(34, 197, 94, 0.18);   /* green */
+    border-color: rgba(34, 197, 94, 0.45);
+    color: #86efac;
+}
+
+/* INACTIVE */
+.pill--inactive {
+    background: rgba(239, 68, 68, 0.18);   /* red */
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #fca5a5;
 }
 
 .pill--off {

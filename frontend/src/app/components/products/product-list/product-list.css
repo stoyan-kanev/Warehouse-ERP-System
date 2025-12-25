@@ -1,155 +1,121 @@
-:root {
-    --bg-page: #181818;
-    --bg-card: #e9ebee;
-    --border-card: #1f2937;
-    --text-main: #e5e5e5;
-    --text-muted: #9ca3af;
-    --accent: #929599;
-    --accent-hover: #2563eb;
-    --radius: 12px;
+:host {
+    --bg-page: #0b1220;
+    --panel: #0f172a;
+    --panel-2: #0b1220;
+
+    --stroke: rgba(255, 255, 255, 0.10);
+    --stroke-2: rgba(255, 255, 255, 0.14);
+
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.60);
+
+    --green: rgba(34, 197, 94, 1);
+    --red: rgba(239, 68, 68, 1);
+
+    --radius: 14px;
 }
 
-.toolbar {
-    display: flex;
-    justify-content: flex-end;
-    margin: 16px 16px 10px;
-}
-
-/* Create Product button */
-.create-btn {
-    background-color: #1e9639 !important;
-
-    color: #ffffff !important;
-    border-radius: 999px !important;
-    padding: 0.5em 1.4em !important;
-    font-weight: 500 !important;
-    text-transform: none !important;
-    transition: ease-in-out 0.2s;
-
-}
-.create-btn:hover {
-    background-color: #3c691f !important;
-    transition: ease-in-out 0.2s;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 14px;
-    padding: 0 16px;
-}
+/* page layout */
 .products-page {
     min-height: calc(100vh - 90px);
     display: flex;
     flex-direction: column;
+    padding: 14px 16px 18px;
+    background: transparent;
 }
-.pagination-footer {
-    margin-top: auto;
-    padding: 12px 0 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 18px;
-}
-/* Карта за продукт */
-/*.product-card {*/
-/*    background-color: #4f6066;*/
-/*    border-radius: var(--radius);*/
-/*    border: 1px solid var(--border-card);*/
-/*    padding: 10px 12px;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    gap: 4px;*/
-/*    color: var(--text-main);*/
-/*    box-sizing: border-box;*/
-/*    transition: border-color 0.15s ease, box-shadow 0.15s ease,*/
-/*    transform 0.08s ease;*/
-/*}*/
 
-.product-card{
-    background-color: #4f6066;
+/* top bar */
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+/* Create button */
+.create-btn {
+    background: rgba(34, 197, 94, 0.95) !important;
+    color: #07110a !important;
+    border-radius: 999px !important;
+    padding: 0.55em 1.4em !important;
+    font-weight: 650 !important;
+    text-transform: none !important;
+    transition: transform 0.1s ease, filter 0.15s ease;
+}
+
+.create-btn:hover {
+    filter: brightness(1.08);
+}
+
+.create-btn:active {
+    transform: translateY(1px);
+}
+
+/* grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+/* card */
+.product-card {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.00)
+    ),
+    var(--panel);
+
+    border: 1px solid var(--stroke);
     border-radius: var(--radius);
-    border: 1px solid var(--border-card);
-    padding: 10px 12px;
-    color: var(--text-main);
+    padding: 12px;
+    color: var(--text);
     box-sizing: border-box;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease;
 
-    /* FIX */
-    display: flex;
-    flex-direction: column;     /* button stays bottom */
-    gap: 10px;
-    align-items: stretch;
-    justify-content: flex-start;
-    flex-wrap: nowrap;          /* махаме wrap */
-}
-
-.product-wrap{
-    /* FIX */
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;                  /* вместо 3rem */
-    width: 100%;
-    min-width: 0;
-}
-
-.product-content{
-    /* FIX */
     display: flex;
     flex-direction: column;
-    align-items: flex-end;      /* за да стои текста вдясно като на screenshot */
-    text-align: right;
-    gap: 4px;
-    min-width: 0;
-    flex: 1;
-}
-
-/* за да не разпъва колоната при дълги имена */
-.product-name,
-.product-sku{
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.card-actions {
-    width: 100%;
     gap: 12px;
-    display: flex
+
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
-.non-active{
-    background-color: #58271f;
+
+.product-card:hover {
+    border-color: rgba(96, 165, 250, 0.35);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+    transform: translateY(-2px);
 }
-.edit-btn{
-    width: 100%;
+
+/* inactive card */
+.product-card.non-active {
+    border-color: rgba(239, 68, 68, 0.22);
+    background: linear-gradient(
+        180deg,
+        rgba(239, 68, 68, 0.06),
+        rgba(255, 255, 255, 0.00)
+    ),
+    var(--panel);
 }
-.product-wrap{
-    display: flex;
-    align-items: center;
+
+/* header row inside card */
+.product-wrap {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+    align-items: start;
+    min-width: 0;
 }
-/*This is for card transformation on hover*/
-/*.product-card:hover {*/
-/*    border-color: var(--accent);*/
-/*    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);*/
-/*    transform: translateY(-2px);*/
-/*}*/
+
+/* thumb */
 .product-thumb {
     width: 110px;
     height: 110px;
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
-    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, 0.04);
     display: flex;
     align-items: center;
     justify-content: center;
-}
-.product-content{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
 }
 
 .product-thumb img {
@@ -158,99 +124,123 @@
     object-fit: cover;
     display: block;
 }
+
 .thumb-placeholder {
     font-size: 12px;
-    opacity: 0.7;
+    color: var(--muted);
 }
+
+/* content */
+.product-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* sku + name */
 .product-sku {
     font-size: 0.75rem;
-    color: var(--accent);
-    font-weight: 500;
+    color: rgba(147, 197, 253, 0.90);
+    font-weight: 650;
+    letter-spacing: 0.03em;
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .product-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-main);
+    font-size: 0.95rem;
+    font-weight: 750;
+    color: var(--text);
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
+/* price */
 .product-price {
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 1.05rem;
+    font-weight: 800;
     margin-top: 2px;
 }
+
 .product-price .currency {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-left: 3px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: 6px;
+    font-weight: 650;
 }
 
+/* meta */
 .product-meta {
     margin-top: 4px;
-    text-align: center;
     display: flex;
     flex-direction: column;
     gap: 2px;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--muted);
 }
 
-/* Placeholder за бъдеща снимка (сега е изключен в HTML) */
-.product-image-placeholder {
-    margin-top: 6px;
+/* actions */
+.card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: auto; /* push buttons to bottom */
+}
+
+/* normalize mat-stroked-button a bit */
+.edit-btn {
     width: 100%;
-    height: 60px;
-    border-radius: 8px;
-    background: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    color: #4b5563;
+    border-radius: 999px !important;
 }
 
-/* Pagination */
-.pagination {
+/* pagination footer */
+.pagination-footer {
+    margin-top: auto;
+    padding-top: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 18px;
-    padding: 16px 0 24px;
-    color: var(--text-main);
 }
 
 .total {
-    font-size: 0.85rem;
-    color: var(--text-muted);
+    font-size: 0.9rem;
+    color: var(--muted);
 }
 
+/* nav buttons */
 .nav-btn {
-    background-color: #374151;
-
-    color: #ffffff;
-    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    border: 1px solid var(--stroke);
     border-radius: 999px;
-    padding: 0.4em 1.2em;
-    font-size: 0.85rem;
-    font-weight: 500;
+    padding: 0.45em 1.2em;
+    font-size: 0.9rem;
+    font-weight: 650;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    transition: transform 0.1s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .nav-btn:hover:not(:disabled) {
-    background-color: #374151;
-
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(96, 165, 250, 0.35);
     transform: translateY(-1px);
 }
 
 .nav-btn:disabled {
-    background-color: transparent;
-
+    opacity: 0.5;
     cursor: default;
     transform: none;
 }
 
-/* Responsive: по-малко колони при тесен екран */
+/* responsive */
 @media (max-width: 1400px) {
     .products-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -272,5 +262,14 @@
 @media (max-width: 500px) {
     .products-grid {
         grid-template-columns: 1fr;
+    }
+
+    .product-wrap {
+        grid-template-columns: 92px 1fr;
+    }
+
+    .product-thumb {
+        width: 92px;
+        height: 92px;
     }
 }
