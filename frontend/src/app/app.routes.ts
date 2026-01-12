@@ -8,8 +8,8 @@ import {authUserGuard} from '../environments/user-guard';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
-    {path: 'login', component: LoginComponent,canActivate: [authUserGuard]},
-    {path: 'register', component: RegisterComponent,canActivate: [authUserGuard]},
+    {path: 'login', component: LoginComponent,},
+    {path: 'register', component: RegisterComponent,},
     {path: 'product-list', component: ProductList},
     {path: 'profile', component:ProfileComponent}
 ];

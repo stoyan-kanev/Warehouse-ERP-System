@@ -1,1 +1,83 @@
-<p>profile works!</p>
+<div class="page">
+    <div class="error-banner" *ngIf="errorMessage">
+        {{ errorMessage }}
+    </div>
+    <div class="success-banner" *ngIf="successMessage">
+        {{ successMessage }}
+    </div>
+    <div class="profile-card">
+        <div class="header">
+
+            <div class="title">Profile</div>
+            <div class="subtitle">
+                <h1>{{ user?.first_name }} {{ user?.last_name }}</h1>
+            </div>
+
+        </div>
+
+        <form class="form" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+            <div class="section">
+                <div class="section__title">Account details</div>
+
+                <div class="grid">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" formControlName="email" placeholder="you@example.com" />
+                        <div class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+                            Please enter a valid email.
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>First name</label>
+                        <input type="text" formControlName="firstName" placeholder="First name" />
+                        <div class="error" *ngIf="form.get('firstName')?.touched && form.get('firstName')?.hasError('required')">
+                            First name is required.
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Last name</label>
+                        <input type="text" formControlName="lastName" placeholder="Last name" />
+                        <div class="error" *ngIf="form.get('lastName')?.touched && form.get('lastName')?.hasError('required')">
+                            Last name is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section__title">Change password</div>
+                <div class="section__hint">Optional — fill only if you want to update your password.</div>
+
+                <div class="grid">
+                    <div class="field">
+                        <label>Current password</label>
+                        <input type="password" formControlName="currentPassword" autocomplete="current-password" placeholder="••••••••" />
+                    </div>
+
+                    <div class="field">
+                        <label>New password</label>
+                        <input type="password" formControlName="newPassword" autocomplete="new-password" placeholder="••••••••" />
+                    </div>
+
+                    <div class="field">
+                        <label>Confirm new password</label>
+                        <input type="password" formControlName="confirmNewPassword" autocomplete="new-password" placeholder="••••••••" />
+                    </div>
+
+                    <div class="error block" *ngIf="form.touched && form.hasError('passwordMismatch')">
+                        Passwords do not match.
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+
+                <button class="btn btn--ghost" type="button" (click)="form.reset()">Reset</button>
+                <button class="btn btn--primary" type="submit" [disabled]="form.invalid">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>

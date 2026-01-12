@@ -13,7 +13,7 @@ import {Router} from '@angular/router';
 })
 export class LoginComponent {
     form: FormGroup;
-
+    error : boolean = false;
     constructor(private formBuilder: FormBuilder, private authService: AuthService,private router: Router) {
         this.form = formBuilder.group({
             email: ['', [Validators.required, Validators.email]],
@@ -35,6 +35,7 @@ export class LoginComponent {
                 },
                 error: (error) => {
                     console.error('Failed to fetch user data:', error);
+                    this.error = true;
                 }
             });
     }

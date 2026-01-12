@@ -2,6 +2,7 @@
     <form class="register_form" [formGroup]="form" (ngSubmit)="onSubmit()">
         <h1 class="form_title">Login</h1>
 
+
         <div class="form_group">
             <label>Email</label>
             <input
@@ -42,7 +43,11 @@
             }
         </div>
 
-
+        @if (error) {
+            <div class="error">
+                <small>Email or password don't match!</small>
+            </div>
+        }
         <button
             class="submit_btn"
             type="submit"

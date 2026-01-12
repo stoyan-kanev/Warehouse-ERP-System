@@ -5,7 +5,7 @@ import {AuthService} from '../app/services/auth-service';
 export const authUserGuard: () => void = () => {
     const router = inject(Router)
     const authService = inject(AuthService)
-
+    const userResult = authService.getCurrentUser();
     if (authService.getCurrentUser()){
         router.navigateByUrl('/')
     }

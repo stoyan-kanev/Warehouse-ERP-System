@@ -1,0 +1,201 @@
+/* Page scaffold */
+.page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 32px 16px;
+    background: radial-gradient(1200px 800px at 20% 10%, rgba(100, 108, 255, 0.25), transparent 60%),
+    radial-gradient(1200px 800px at 80% 90%, rgba(83, 94, 242, 0.18), transparent 60%),
+    #0f1115;
+}
+
+/* Card container */
+.profile-card {
+    width: 100%;
+    max-width: 760px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(20, 22, 28, 0.85);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    padding: 22px 22px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.success-banner {
+    margin: 16px 22px 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(40, 160, 90, 0.95);
+    background: rgba(40, 160, 90, 0.12);
+    border: 1px solid rgba(40, 160, 90, 0.25);
+}
+.error-banner {
+    margin: 16px 22px 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(160, 40, 40, 0.95);
+    background: rgba(160, 40, 40, 0.12);
+    border: 1px solid rgba(160, 40, 40, 0.25);
+}
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: rgba(255,255,255,0.92);
+}
+
+.subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+}
+
+/* Form layout */
+.form {
+    padding: 22px;
+    display: grid;
+    gap: 18px;
+}
+
+.section {
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.03);
+}
+
+.section__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 6px;
+}
+
+.section__hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 14px;
+}
+
+.grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Single column on smaller screens */
+@media (max-width: 640px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.field {
+    display: grid;
+    gap: 8px;
+}
+
+label {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.2px;
+}
+
+/* Inputs */
+input {
+    height: 44px;
+    width: 100%;
+    border-radius: 12px;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(0,0,0,0.20);
+    color: rgba(255,255,255,0.92);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.05s ease;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,0.35);
+}
+
+input:focus {
+    border-color: rgba(100, 108, 255, 0.7);
+    box-shadow: 0 0 0 4px rgba(100, 108, 255, 0.18);
+}
+
+input.ng-touched.ng-invalid {
+    border-color: rgba(255, 90, 90, 0.65);
+    box-shadow: 0 0 0 4px rgba(255, 90, 90, 0.12);
+}
+
+/* Errors */
+.error {
+    font-size: 12px;
+    color: rgba(255, 120, 120, 0.95);
+    line-height: 1.3;
+}
+
+.error.block {
+    grid-column: 1 / -1;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 90, 90, 0.25);
+    background: rgba(255, 90, 90, 0.08);
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding-top: 2px;
+}
+
+.btn {
+    height: 44px;
+    border-radius: 12px;
+    padding: 0 14px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.05s ease, opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, rgba(100,108,255,0.95), rgba(83,94,242,0.95));
+    color: white;
+    border-color: rgba(255,255,255,0.08);
+}
+
+.btn--primary:hover:not(:disabled) {
+    opacity: 0.95;
+}
+
+.btn--ghost {
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,0.10);
+}
+
+.btn--ghost:hover {
+    background: rgba(255,255,255,0.06);
+}
