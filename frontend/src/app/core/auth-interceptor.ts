@@ -12,7 +12,6 @@ import { environment } from '../../environments/environment';
 const API = environment.apiUrl;
 
 const REFRESH_PATH = '/users/refresh/';
-const ME_PATH = '/users/me/';
 const LOGIN_ROUTE = '/login';
 const REFRESH_URL = `${API}${REFRESH_PATH}`;
 
@@ -43,15 +42,6 @@ function shouldSkipAuthHandling(url: string) {
     );
 }
 
-/**
- * IMPORTANT:
- * - Do NOT try to refresh on /users/me/
- *   This endpoint is used to detect session existence.
- */
-function shouldNeverRefresh(url: string) {
-    return url.endsWith(ME_PATH);
-}
-
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const router = inject(Router);
 
@@ -67,12 +57,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 return throwError(() => error);
             }
 
-            // If /users/me/ is 401 => just let it fail (no refresh)
-            if (shouldNeverRefresh(authReq.url)) {
-                return throwError(() => error);
-            }
-
-            // If already refreshing, wait and retry original request
             if (isRefreshing) {
                 return refreshDone$.pipe(
                     take(1),
@@ -93,7 +77,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 catchError((refreshErr) => {
                     isRefreshing = false;
 
-                    //refresh failed => no session => go login
+                    refreshDone$.next();
+
+                    localStorage.removeItem('user');
+
                     router.navigateByUrl(LOGIN_ROUTE);
 
                     return throwError(() => refreshErr);

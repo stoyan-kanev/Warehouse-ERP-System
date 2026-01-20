@@ -21,7 +21,9 @@
     display: flex;
     flex-direction: column;
     padding: 14px 16px 18px;
-    background: transparent;
+    background: radial-gradient(1200px 800px at 20% 10%, rgba(100, 108, 255, 0.25), transparent 60%),
+    radial-gradient(1200px 800px at 80% 90%, rgba(83, 94, 242, 0.18), transparent 60%),
+    #0f1115;
 }
 
 /* top bar */

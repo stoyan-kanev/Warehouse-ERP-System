@@ -82,7 +82,6 @@ class MeUpdateSerializer(serializers.ModelSerializer):
                     "current_password": "Current password is incorrect."
                 })
 
-            # Use Django password validators
             try:
                 validate_password(new_password, user=user)
             except DjangoValidationError as e:
@@ -90,7 +89,6 @@ class MeUpdateSerializer(serializers.ModelSerializer):
 
         return attrs
     def update(self, instance, validated_data):
-        # Pop password fields so they don’t go into normal update
         new_password = validated_data.pop("new_password", None)
         validated_data.pop("current_password", None)
 
@@ -98,7 +96,7 @@ class MeUpdateSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
 
         if new_password is not None:
-            instance.set_password(new_password)  # hashes properly
+            instance.set_password(new_password)
 
         instance.save()
         return instance
