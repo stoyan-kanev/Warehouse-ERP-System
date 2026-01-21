@@ -4,19 +4,18 @@ import {
     HttpRequest,
     HttpHandlerFn,
 } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { catchError, switchMap, take, throwError, Subject } from 'rxjs';
+import { catchError, switchMap, take, throwError, Subject, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 const API = environment.apiUrl;
 
 const REFRESH_PATH = '/users/refresh/';
-const LOGIN_ROUTE = '/login';
 const REFRESH_URL = `${API}${REFRESH_PATH}`;
 
 let isRefreshing = false;
-const refreshDone$ = new Subject<void>();
+const refreshDone$ = new Subject<boolean>();
+
+let didBootstrapRefresh = false;
 
 function prepareRequest(req: HttpRequest<unknown>) {
     const isApiRelative = req.url.startsWith('/users/') || req.url.startsWith('/api/');
@@ -42,13 +41,24 @@ function shouldSkipAuthHandling(url: string) {
     );
 }
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-    const router = inject(Router);
+function isApiCall(url: string) {
+    return url.startsWith(API) || url.startsWith('/users/') || url.startsWith('/api/');
+}
 
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authReq = prepareRequest(req);
 
     if (shouldSkipAuthHandling(authReq.url)) {
         return next(authReq);
+    }
+
+    if (!didBootstrapRefresh && isApiCall(req.url)) {
+        didBootstrapRefresh = true;
+
+        return callRefresh(next).pipe(
+            switchMap(() => next(authReq)),
+            catchError(() => next(authReq))
+        );
     }
 
     return next(authReq).pipe(
@@ -60,7 +70,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             if (isRefreshing) {
                 return refreshDone$.pipe(
                     take(1),
-                    switchMap(() => next(prepareRequest(req)))
+                    switchMap((ok) => {
+                        if (!ok) return throwError(() => error);
+                        return next(prepareRequest(req));
+                    })
                 );
             }
 
@@ -69,19 +82,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             return callRefresh(next).pipe(
                 switchMap(() => {
                     isRefreshing = false;
-                    refreshDone$.next();
+                    refreshDone$.next(true);
 
-                    // retry original request
                     return next(prepareRequest(req));
                 }),
                 catchError((refreshErr) => {
                     isRefreshing = false;
 
-                    refreshDone$.next();
+                    refreshDone$.next(false);
 
                     localStorage.removeItem('user');
-
-                    router.navigateByUrl(LOGIN_ROUTE);
 
                     return throwError(() => refreshErr);
                 })

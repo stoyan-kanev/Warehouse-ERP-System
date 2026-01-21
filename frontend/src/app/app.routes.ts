@@ -4,12 +4,13 @@ import {LoginComponent} from './components/login/login';
 import {RegisterComponent} from './components/register/register';
 import {ProductList} from './components/products/product-list/product-list';
 import {ProfileComponent} from './components/profile/profile';
-import {authUserGuard} from '../environments/user-guard';
+import {guestOnlyGuard, } from './guards/guest-only-guard/guest-only-guard';
+import {authGuard} from './guards/auth-guard/auth-guard-guard';
 
 export const routes: Routes = [
-    {path: '', component: HomeComponent},
-    {path: 'login', component: LoginComponent,},
-    {path: 'register', component: RegisterComponent,},
-    {path: 'product-list', component: ProductList},
-    {path: 'profile', component:ProfileComponent}
+    {path: '', component: HomeComponent,},
+    {path: 'login', component: LoginComponent, canActivate:[guestOnlyGuard]},
+    {path: 'register', component: RegisterComponent,canActivate:[guestOnlyGuard]},
+    {path: 'product-list', component: ProductList, canActivate:[authGuard] },
+    {path: 'profile', component:ProfileComponent, canActivate:[authGuard] },
 ];
