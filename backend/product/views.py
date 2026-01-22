@@ -25,7 +25,7 @@ class ProductListView(ListAPIView):
 
 
 class ManageProductView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]

@@ -1,9 +1,11 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from warehouse.views import WarehouseViewSet, StockLevelViewSet
 
-from warehouse.views import StockLevelView, StockLevelDetailView
+router = DefaultRouter()
+router.register(r"warehouses", WarehouseViewSet, basename="warehouses")
+router.register(r"stocklevels", StockLevelViewSet, basename="stocklevels")
 
 urlpatterns = [
-    path('api/v1/stocklevel',StockLevelView.as_view(), name='stocklevel'),
-    path('api/v1/stocklevel/<int:pk>', StockLevelDetailView.as_view(), name='stocklevel'),
-
+    path("api/v1/", include(router.urls)),
 ]

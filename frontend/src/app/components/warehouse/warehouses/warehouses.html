@@ -1,0 +1,19 @@
+<div class="warehouse-page">
+    <div class="toolbar">
+        <button mat-flat-button class="create-btn" (click)="openCreate()">
+            + Create Warehouse
+        </button>
+    </div>
+
+    @if (isCreateOpen) {
+        <div class="modal-backdrop" (click)="closeCreate()"></div>
+
+        <div class="modal-wrap" role="dialog" aria-modal="true">
+            <app-warehouse-creation
+                [isSaving]="isSaving"
+                (cancel)="closeCreate()"
+                (submitForm)="createWarehouse($event)">
+            </app-warehouse-creation>
+        </div>
+    }
+</div>

@@ -1,49 +1,73 @@
-from django.shortcuts import render, get_object_or_404
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import viewsets, permissions
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from warehouse.models import StockLevel
-from warehouse.serializers import StockLevelSerializer
+from warehouse.models import Warehouse, StockLevel
+from warehouse.serializers import WarehouseSerializer, StockLevelSerializer
 
 
-# Create your views here.
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Read: authenticated users
+    Write: admin/staff only
+    """
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return request.user and request.user.is_authenticated
+        return request.user and request.user.is_authenticated and request.user.is_staff
 
 
-class StockLevelView(APIView):
-    permission_classes = (AllowAny,)
+class WarehouseViewSet(viewsets.ModelViewSet):
+    serializer_class = WarehouseSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        stock = StockLevel.objects.all()
-        serializer = StockLevelSerializer(stock, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        qs = Warehouse.objects.all()
+        include_inactive = self.request.query_params.get("include_inactive", "").lower() in ("1", "true", "yes")
+        if not include_inactive:
+            qs = qs.filter(is_active=True)
+        return qs
 
-    def post(self, request, *args, **kwargs):
-        serializer = StockLevelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def perform_destroy(self, instance):
+        # deactivate вместо hard delete
+        instance.is_active = False
+        instance.save(update_fields=["is_active"])
 
 
-class StockLevelDetailView(APIView):
-    permission_classes = (AllowAny,)
+class StockLevelViewSet(viewsets.ModelViewSet):
+    serializer_class = StockLevelSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
-    def get(self, request, pk, *args, **kwargs):
-        stock = get_object_or_404(StockLevel, id=pk)
-        serializer = StockLevelSerializer(stock)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        qs = StockLevel.objects.select_related("product", "warehouse")
 
-    def put(self, request, pk, *args, **kwargs):
-        stock = get_object_or_404(StockLevel, id=pk)
-        serializer = StockLevelSerializer(stock, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        warehouse_id = self.request.query_params.get("warehouse")
+        if warehouse_id:
+            qs = qs.filter(warehouse_id=warehouse_id)
 
-    def delete(self, request, pk, *args, **kwargs):
-        stock = get_object_or_404(StockLevel, id=pk)
-        stock.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        product_id = self.request.query_params.get("product")
+        if product_id:
+            qs = qs.filter(product_id=product_id)
+
+        return qs
+
+    def perform_create(self, serializer):
+        """
+        Warehouse context:
+        - ако има ?warehouse=<id>, той се използва
+        - иначе очаква warehouse да е в body
+        """
+        warehouse_id = self.request.query_params.get("warehouse")
+        if warehouse_id:
+            try:
+                warehouse = Warehouse.objects.get(pk=warehouse_id, is_active=True)
+            except Warehouse.DoesNotExist:
+                raise ValidationError({"warehouse": "Invalid or inactive warehouse."})
+
+            serializer.save(warehouse=warehouse)
+            return
+
+        serializer.save()

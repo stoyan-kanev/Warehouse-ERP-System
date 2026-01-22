@@ -6,6 +6,7 @@ import {ProductList} from './components/products/product-list/product-list';
 import {ProfileComponent} from './components/profile/profile';
 import {guestOnlyGuard, } from './guards/guest-only-guard/guest-only-guard';
 import {authGuard} from './guards/auth-guard/auth-guard-guard';
+import {WarehousesComponent} from './components/warehouse/warehouses/warehouses';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent,},
@@ -13,4 +14,5 @@ export const routes: Routes = [
     {path: 'register', component: RegisterComponent,canActivate:[guestOnlyGuard]},
     {path: 'product-list', component: ProductList, canActivate:[authGuard] },
     {path: 'profile', component:ProfileComponent, canActivate:[authGuard] },
+    {path: 'warehouses', component:WarehousesComponent, canActivate:[authGuard] },
 ];

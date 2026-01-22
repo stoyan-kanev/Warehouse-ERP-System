@@ -1,0 +1,69 @@
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <h2 class="dialog__title">Add Warehouse</h2>
+            <p class="dialog__subtitle">Create a new warehouse and activate it for stock operations.</p>
+        </div>
+
+        <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">
+            ✕
+        </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        <!-- General -->
+        <div class="section">
+            <div class="section__title">General</div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label for="name">Name <span class="req">*</span></label>
+                    <input
+                        id="name"
+                        type="text"
+                        formControlName="name"
+                        placeholder="Main Warehouse"
+                        [class.invalid]="isInvalid('name')"
+                    />
+
+                    @if (isInvalid('name')) {
+                        <small class="error">Warehouse name is required.</small>
+                    }
+                </div>
+
+                <div class="field">
+                    <label for="location">Location <span class="req">*</span></label>
+                    <input
+                        id="location"
+                        type="text"
+                        formControlName="location"
+                        placeholder="Sofia, Bulgaria"
+                        [class.invalid]="isInvalid('location')"
+                    />
+
+                    @if (isInvalid('location')) {
+                        <small class="error">Location is required.</small>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="section">
+            <div class="section__title">Status</div>
+
+            <div class="checkbox">
+                <input id="is_active" type="checkbox" formControlName="is_active" />
+                <label for="is_active">Active warehouse</label>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
+            <button type="submit" class="btn primary save" [disabled]="form.invalid || isSaving">
+                {{ isSaving ? 'Saving...' : 'Save changes' }}
+            </button>
+        </div>
+    </form>
+</div>

@@ -6,14 +6,12 @@ from django.db.models.functions import Lower
 # Create your models here.
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
-    sku = models.CharField(max_length=100,db_index=True)
+    sku = models.CharField(max_length=100,db_index=True,blank=False)
     name = models.CharField(max_length=100)
     description = models.TextField()
     unit = models.CharField(max_length=100)
-    quantity = models.IntegerField(default=0)
-    min_stock_level = models.IntegerField()
-    price_sell = models.FloatField()
-    price_buy = models.FloatField()
+    price_sell = models.DecimalField(max_digits=12, decimal_places=2)
+    price_buy = models.DecimalField(max_digits=12, decimal_places=2)
     is_active = models.BooleanField(default=True)
 
     image = models.ImageField(upload_to="products/%Y/%m/%d/", blank=True, null=True)
