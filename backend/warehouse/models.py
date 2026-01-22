@@ -13,7 +13,7 @@ class Warehouse(models.Model):
 
     class Meta:
         db_table = "warehouse"
-        ordering = ["-created_at"]
+        ordering = ["id"]
 
     def __str__(self):
         return self.name

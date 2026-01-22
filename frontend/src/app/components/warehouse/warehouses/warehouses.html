@@ -3,6 +3,21 @@
         <button mat-flat-button class="create-btn" (click)="openCreate()">
             + Create Warehouse
         </button>
+        <select
+            id="warehouse"
+            [value]="selectedWarehouseId"
+            (change)="onWarehouseChange($any($event.target).value)"
+        >
+            <option value="" disabled>
+                Select warehouse…
+            </option>
+
+            @for (w of warehouses; track w.id) {
+                <option [value]="w.id">
+                    {{ w.name }} — {{ w.location }}
+                </option>
+            }
+        </select>
     </div>
 
     @if (isCreateOpen) {

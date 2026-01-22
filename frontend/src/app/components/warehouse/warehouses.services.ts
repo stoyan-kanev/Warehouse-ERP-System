@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {environment} from '../../../environments/environment';
 
 export type Warehouse = {
@@ -18,6 +18,12 @@ export type WarehouseCreatePayload = {
     location: string;
     is_active: boolean;
 };
+type Paginated<T> = {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
+};
 
 @Injectable({ providedIn: 'root' })
 export class WarehousesService {
@@ -29,10 +35,9 @@ export class WarehousesService {
         let params = new HttpParams();
         if (includeInactive) params = params.set('include_inactive', 'true');
 
-        return this.http.get<Warehouse[]>(this.baseUrl, {
-            params,
-            withCredentials: true,
-        });
+        return this.http
+            .get<Paginated<Warehouse>>(this.baseUrl, { params, withCredentials: true })
+            .pipe(map((res) => res.results));
     }
 
     create(payload: WarehouseCreatePayload): Observable<Warehouse> {
@@ -42,13 +47,13 @@ export class WarehousesService {
     }
 
     update(id: number, payload: Partial<WarehouseCreatePayload>): Observable<Warehouse> {
-        return this.http.patch<Warehouse>(`${this.baseUrl}${id}/`, payload, {
+        return this.http.patch<Warehouse>(`${this.baseUrl}${id}`, payload, {
             withCredentials: true,
         });
     }
 
     deactivate(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}${id}/`, {
+        return this.http.delete<void>(`${this.baseUrl}${id}`, {
             withCredentials: true,
         });
     }

@@ -11,6 +11,8 @@ class WarehouseSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "created_by", "created_at", "updated_at")
 
 
+
+
 class StockLevelSerializer(serializers.ModelSerializer):
     # Product info за UI (read-only) – за да не правиш втори request
     product_sku = serializers.CharField(source="product.sku", read_only=True)

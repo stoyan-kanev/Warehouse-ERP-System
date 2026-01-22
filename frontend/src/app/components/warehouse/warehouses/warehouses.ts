@@ -8,15 +8,17 @@ import {Warehouse, WarehouseCreatePayload, WarehousesService} from '../warehouse
     imports: [
         MatButton,
         WarehouseCreation,
+
     ],
   templateUrl: './warehouses.html',
   styleUrl: './warehouses.css',
 })
 export class WarehousesComponent implements OnInit {
+    warehouses: Warehouse[] = [];
+    selectedWarehouseId: number | null = null;
+
     isCreateOpen = false;
     isSaving = false;
-    warehouses: Warehouse[] = [];
-
 
     constructor(private warehousesService: WarehousesService) {}
 
@@ -24,11 +26,24 @@ export class WarehousesComponent implements OnInit {
         this.loadWarehouses();
     }
 
-    loadWarehouses(): void {
+    loadWarehouses(selectFirst = true): void {
         this.warehousesService.list(false).subscribe({
-            next: (data) => (this.warehouses = data),
+            next: (data) => {
+                this.warehouses = data;
+
+                if (selectFirst && this.selectedWarehouseId == null && this.warehouses.length) {
+                    this.selectedWarehouseId = this.warehouses[0].id;
+                    this.onWarehouseChange(this.selectedWarehouseId);
+                }
+            },
             error: (err) => console.error('Failed to load warehouses', err),
         });
+    }
+
+    onWarehouseChange(value: string | number): void {
+        const id = Number(value);
+        this.selectedWarehouseId = Number.isFinite(id) ? id : null;
+        console.log('Selected warehouse:', this.selectedWarehouseId);
     }
 
     openCreate(): void {
