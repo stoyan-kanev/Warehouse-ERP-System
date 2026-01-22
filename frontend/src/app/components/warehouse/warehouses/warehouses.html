@@ -3,23 +3,84 @@
         <button mat-flat-button class="create-btn" (click)="openCreate()">
             + Create Warehouse
         </button>
-        <select
-            id="warehouse"
-            [value]="selectedWarehouseId"
-            (change)="onWarehouseChange($any($event.target).value)"
+        <button
+            mat-flat-button
+            class="create-btn"
+            [disabled]="!selectedWarehouseId"
+            (click)="openAddToWarehouseDialog()"
         >
-            <option value="" disabled>
-                Select warehouse…
-            </option>
-
-            @for (w of warehouses; track w.id) {
-                <option [value]="w.id">
-                    {{ w.name }} — {{ w.location }}
+            + Add Product to Warehouse
+        </button>
+        <div class="select-wrap">
+            <select
+                id="warehouse"
+                [value]="selectedWarehouseId"
+                (change)="onWarehouseChange($any($event.target).value)"
+            >
+                <option value="" disabled>
+                    Select warehouse…
                 </option>
-            }
-        </select>
-    </div>
 
+                @for (w of warehouses; track w.id) {
+                    <option [value]="w.id">
+                        {{ w.name }} — {{ w.location }}
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="products-grid">
+        @if (!selectedWarehouseId) {
+            <div class="empty-state">Select a warehouse to see its products.</div>
+        } @else {
+            @if (isStockLoading) {
+                <div class="empty-state">Loading...</div>
+            } @else {
+                @if (stockLevels.length === 0) {
+                    <div class="empty-state">No products in this warehouse yet.</div>
+                } @else {
+                    @for (sl of stockLevels; track sl.id) {
+                        <div class="product-card">
+                            <div class="product-wrap">
+                                <!--                                <div class="product-thumb">-->
+                                <!--                                    -->
+                                <!--                                    <div class="thumb-placeholder">No image</div>-->
+                                <!--                                </div>-->
+
+                                <div class="product-content">
+                                    <div class="product-sku">{{ sl.product_sku }}</div>
+                                    <div class="product-name">{{ sl.product_name }}</div>
+
+                                    <div class="product-price">
+                                        {{ sl.price_sell | number:'1.2-2' }}
+                                        <span class="currency">лв</span>
+                                    </div>
+
+                                    <div class="product-meta">
+                                        <span>Quantity: {{ sl.quantity }}</span>
+                                        <span>Min: {{ sl.min_stock_level }}</span>
+                                        <span>Unit: {{ sl.product_unit }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-actions">
+                                <button class="edit-btn" mat-stroked-button color="primary"
+                                        (click)="openStockDetails(sl)">
+                                    Details
+                                </button>
+
+                                <button class="danger-btn" mat-stroked-button color="warn"
+                                        (click)="removeFromWarehouse(sl)">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        }
+    </div>
     @if (isCreateOpen) {
         <div class="modal-backdrop" (click)="closeCreate()"></div>
 
@@ -29,6 +90,27 @@
                 (cancel)="closeCreate()"
                 (submitForm)="createWarehouse($event)">
             </app-warehouse-creation>
+        </div>
+    }
+    @if (isAddOpen) {
+        <div class="modal-backdrop" (click)="closeAddToWarehouseDialog()"></div>
+
+        <div class="modal-wrap" role="dialog" aria-modal="true">
+            <app-warehouse-add-product-dialog
+                [isSaving]="isAddSaving"
+                (cancel)="closeAddToWarehouseDialog()"
+                (submitForm)="submitAddToWarehouse($event)">
+            </app-warehouse-add-product-dialog>
+        </div>
+    }
+    @if (isDetailsOpen && selectedStock) {
+        <div class="modal-backdrop" (click)="closeStockDetails()"></div>
+
+        <div class="modal-wrap" role="dialog" aria-modal="true">
+            <app-warehouse-detail-product-dialog
+                [stock]="selectedStock"
+                (close)="closeStockDetails()">
+            </app-warehouse-detail-product-dialog>
         </div>
     }
 </div>

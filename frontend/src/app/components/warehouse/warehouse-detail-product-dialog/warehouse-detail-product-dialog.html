@@ -1,0 +1,42 @@
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <h2 class="dialog__title">Stock Details</h2>
+            <p class="dialog__subtitle">
+                {{ stock.product_sku }} — {{ stock.product_name }}
+            </p>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <div class="section__title">Warehouse</div>
+        <div class="kv">
+            <div class="kv__row"><span>Warehouse</span><b>{{ stock.warehouse_name }}</b></div>
+            <div class="kv__row"><span>Updated</span><b>{{ stock.updated_at | date:'medium' }}</b></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section__title">Product</div>
+        <div class="kv">
+            <div class="kv__row"><span>SKU</span><b>{{ stock.product_sku }}</b></div>
+            <div class="kv__row"><span>Name</span><b>{{ stock.product_name }}</b></div>
+            <div class="kv__row"><span>Unit</span><b>{{ stock.product_unit }}</b></div>
+            <div class="kv__row"><span>Sell price</span><b>{{ stock.price_sell | number:'1.2-2' }} лв</b></div>
+            <div class="kv__row"><span>Buy price</span><b>{{ stock.price_buy | number:'1.2-2' }} лв</b></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section__title">Stock</div>
+        <div class="kv">
+            <div class="kv__row"><span>Quantity</span><b>{{ stock.quantity }}</b></div>
+            <div class="kv__row"><span>Min stock level</span><b>{{ stock.min_stock_level }}</b></div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="button" class="btn ghost" (click)="onClose()">Close</button>
+    </div>
+</div>

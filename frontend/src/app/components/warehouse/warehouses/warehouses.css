@@ -1,105 +1,42 @@
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(2px);
-    z-index: 999;
+:host {
+    --bg-page: #0b1220;
+    --panel: #0f172a;
+    --panel-2: #0b1220;
+
+    --stroke: rgba(255, 255, 255, 0.10);
+    --stroke-2: rgba(255, 255, 255, 0.14);
+
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.60);
+
+    --green: rgba(34, 197, 94, 1);
+    --red: rgba(239, 68, 68, 1);
+
+    --radius: 14px;
 }
 
-.modal-wrap {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 16px;
-    z-index: 1000;
-}
-
-/* гарантираме, че dialog-а не става прекалено широк */
-.modal-wrap app-warehouse-creation {
-    width: 100%;
-    max-width: 720px;
-}
-
-/* optional: лек enter ефект */
-.modal-wrap {
-    animation: popIn 120ms ease-out;
-}
-@keyframes popIn {
-    from { opacity: 0; transform: scale(0.985); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-
-.warehouse-page{
+/* page layout */
+.warehouse-page {
     min-height: calc(100vh - 90px);
     display: flex;
     flex-direction: column;
     padding: 14px 16px 18px;
-    background: radial-gradient(1200px 800px at 20% 10%, rgba(100, 108, 255, 0.25), transparent 60%),
-    radial-gradient(1200px 800px at 80% 90%, rgba(83, 94, 242, 0.18), transparent 60%),
-    #0f1115;
+    background:
+        radial-gradient(1200px 800px at 20% 10%, rgba(100, 108, 255, 0.25), transparent 60%),
+        radial-gradient(1200px 800px at 80% 90%, rgba(83, 94, 242, 0.18), transparent 60%),
+        #0f1115;
 }
+
+/* top bar */
 .toolbar {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
 }
 
-.warehouse-select {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 260px;
-}
-
-.warehouse-select label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-weight: 550;
-}
-
-.warehouse-select select {
-    appearance: none;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 12px;
-    border: 1px solid var(--stroke-2);
-    background: rgba(11, 18, 32, 0.65);
-    color: var(--text);
-    font-size: 0.95rem;
-    outline: none;
-    cursor: pointer;
-
-    transition:
-        border-color 0.18s ease,
-        box-shadow 0.18s ease,
-        background 0.18s ease;
-}
-
-.warehouse-select select:focus {
-    border-color: rgba(96, 165, 250, 0.55);
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
-    background: rgba(11, 18, 32, 0.85);
-}
-
-/* стрелка */
-.warehouse-select {
-    position: relative;
-}
-
-.warehouse-select::after {
-    content: "▾";
-    position: absolute;
-    right: 14px;
-    top: 34px;
-    color: var(--muted);
-    pointer-events: none;
-    font-size: 0.9rem;
-}
-
-
-
+/* Create button */
 .create-btn {
     background: rgba(34, 197, 94, 0.95) !important;
     color: #07110a !important;
@@ -117,13 +54,225 @@
 .create-btn:active {
     transform: translateY(1px);
 }
-/* ако искаш да е по-компактно */
-@media (max-width: 720px) {
-    .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .warehouse-select {
-        width: 100%;
-    }
+
+/* dropdown (standard css, matches theme) */
+.toolbar select {
+    appearance: none;
+    min-width: 280px;
+    padding: 10px 12px;
+    padding-right: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.toolbar select:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.toolbar select:focus {
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.18);
+}
+
+/* dropdown arrow */
+.toolbar {
+    position: relative;
+}
+.toolbar select {
+    position: relative;
+}
+.toolbar::after {
+    content: "▾";
+    margin-left: -34px;
+    color: var(--muted);
+    pointer-events: none;
+    line-height: 1;
+}
+
+/* grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+/* card */
+.product-card {
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.00)
+    ),
+    var(--panel);
+
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius);
+    padding: 12px;
+    color: var(--text);
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.product-card:hover {
+    border-color: rgba(96, 165, 250, 0.35);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+    transform: translateY(-2px);
+}
+
+/* header row inside card */
+.product-wrap {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
+    min-width: 0;
+}
+
+/* content */
+.product-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* sku + name */
+.product-sku {
+    font-size: 0.75rem;
+    color: rgba(147, 197, 253, 0.90);
+    font-weight: 650;
+    letter-spacing: 0.03em;
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-name {
+    font-size: 0.95rem;
+    font-weight: 750;
+    color: var(--text);
+
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* price */
+.product-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-top: 2px;
+}
+
+.product-price .currency {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: 6px;
+    font-weight: 650;
+}
+
+/* meta */
+.product-meta {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* actions */
+.card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: auto;
+}
+
+/* normalize mat-stroked-button a bit */
+.edit-btn {
+    width: 100%;
+    border-radius: 999px !important;
+}
+
+/* make warn look consistent */
+.danger-btn {
+    width: 100%;
+    border-radius: 999px !important;
+}
+
+/* empty state */
+.empty-state {
+    grid-column: 1 / -1;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+    text-align: center;
+}
+
+/* modal system */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 20, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+.modal-wrap {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    z-index: 1000;
+    animation: modalFadeIn 140ms ease-out;
+}
+.select-wrap { position: relative; }
+.select-wrap::after {
+    content: "▾";
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.985); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* responsive */
+@media (max-width: 1400px) {
+    .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1100px) {
+    .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 800px) {
+    .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .toolbar select { min-width: 100%; }
 }

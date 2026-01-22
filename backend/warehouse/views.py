@@ -39,7 +39,7 @@ class WarehouseViewSet(viewsets.ModelViewSet):
 
 class StockLevelViewSet(viewsets.ModelViewSet):
     serializer_class = StockLevelSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         qs = StockLevel.objects.select_related("product", "warehouse")

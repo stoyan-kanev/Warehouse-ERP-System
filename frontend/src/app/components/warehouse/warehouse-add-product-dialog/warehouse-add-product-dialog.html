@@ -1,0 +1,49 @@
+<div class="dialog">
+    <div class="dialog__header">
+        <div class="dialog__title-wrap">
+            <h2 class="dialog__title">Add Product to Warehouse</h2>
+            <p class="dialog__subtitle">Link a product to this warehouse and set initial stock thresholds.</p>
+        </div>
+
+        <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">✕</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        <div class="section">
+            <div class="section__title">Product</div>
+
+            <div class="grid grid--2">
+                <div class="field">
+                    <label for="product">Product ID <span class="req">*</span></label>
+                    <input
+                        id="product"
+                        type="number"
+                        formControlName="product"
+                        placeholder="e.g. 12"
+                        [class.invalid]="isInvalid('product')"
+                    />
+                    @if (isInvalid('product')) {
+                        <small class="error">Valid product ID is required.</small>
+                    }
+                </div>
+
+                <div class="field">
+                    <label for="quantity">Quantity</label>
+                    <input id="quantity" type="number" step="0.01" formControlName="quantity" />
+                </div>
+
+                <div class="field">
+                    <label for="min_stock_level">Min Stock Level</label>
+                    <input id="min_stock_level" type="number" step="0.01" formControlName="min_stock_level" />
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
+            <button type="submit" class="btn primary save" [disabled]="form.invalid || isSaving">
+                {{ isSaving ? 'Saving...' : 'Add' }}
+            </button>
+        </div>
+    </form>
+</div>
