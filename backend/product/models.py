@@ -6,7 +6,7 @@ from django.db.models.functions import Lower
 # Create your models here.
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
-    sku = models.CharField(max_length=100,db_index=True,blank=False)
+    sku = models.CharField(max_length=100,db_index=True,blank=False, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     unit = models.CharField(max_length=100)

@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -41,18 +42,35 @@ class ManageProductView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = ProductSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
-            product = serializer.save()
+            try:
+                product = serializer.save()
+            except IntegrityError:
+                return Response(
+                    {"sku": ["SKU already exists."]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             out = ProductSerializer(product, context={"request": request})
             return Response(out.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk=None, *args, **kwargs):
         product = get_object_or_404(Product, pk=pk)
         serializer = ProductSerializer(product, data=request.data, partial=False, context={"request": request})
+
         if serializer.is_valid():
-            product = serializer.save()
+            try:
+                product = serializer.save()
+            except IntegrityError:
+                return Response(
+                    {"sku": ["SKU already exists."]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             out = ProductSerializer(product, context={"request": request})
             return Response(out.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk=None, *args, **kwargs):

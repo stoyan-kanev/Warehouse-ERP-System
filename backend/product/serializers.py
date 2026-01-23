@@ -8,14 +8,20 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
-    def validate_sku(self, value):
-        v = value.strip()
-        qs = Product.objects.filter(sku__iexact=v)
+    def validate_sku(self, value: str):
+        sku = (value or "").strip()
+        if not sku:
+            raise serializers.ValidationError("SKU is required.")
+
+        qs = Product.objects.filter(sku__iexact=sku)
+
         if self.instance:
             qs = qs.exclude(pk=self.instance.pk)
+
         if qs.exists():
-            raise serializers.ValidationError("SKU must be unique.")
-        return v
+            raise serializers.ValidationError("SKU already exists.")
+
+        return sku
 
     def create(self, validated_data):
         validated_data['sku'] = validated_data['sku'].strip().upper()

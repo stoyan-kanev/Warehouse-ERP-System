@@ -12,6 +12,11 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
         <!-- General -->
+        @if (errorMessage) {
+            <div class="form-error">
+                {{ capitalizeFirst(errorMessage) }}
+            </div>
+        }
         <div class="section">
             <div class="section__title">General</div>
 

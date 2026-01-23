@@ -18,6 +18,7 @@ export class ProductFormDialogComponent implements OnInit {
     selectedFile: File | null = null;
     selectedFileName: string | null = null;
 
+    errorMessage: string | null = null;
 
 
 
@@ -47,7 +48,12 @@ export class ProductFormDialogComponent implements OnInit {
         this.selectedFile = file;
         this.selectedFileName = file ? file.name : null;
     }
+    capitalizeFirst(value: unknown): string {
+        if (Array.isArray(value)) value = value[0];
+        if (typeof value !== 'string' || !value.length) return '';
 
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    }
     onSubmit() {
         if (this.form.invalid) return;
 
@@ -70,7 +76,15 @@ export class ProductFormDialogComponent implements OnInit {
 
         this.productService.createProduct(fd).subscribe({
             next: () => this.dialogRef.close('refresh'),
-            error: err => console.error('Error creating product:', err)
+            error: err => {
+
+                if (err.error.sky){
+                    this.errorMessage = err.error.sku
+                }else{
+                    this.errorMessage = 'Something went wrong check if you filled the form correctly!';
+                }
+
+            },
         });
     }
 
