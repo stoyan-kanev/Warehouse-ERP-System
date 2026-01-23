@@ -277,7 +277,19 @@
     outline: none;
     transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
+.qty {
+    font-weight: 650;
+}
 
+.qty-low {
+    color: var(--red);
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    padding: 2px 8px;
+    border-radius: 999px;
+    display: inline-flex;
+    width: fit-content;
+}
 .sku-input:hover {
     background: rgba(255, 255, 255, 0.09);
     border-color: rgba(96, 165, 250, 0.35);

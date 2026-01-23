@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -58,38 +59,59 @@ class StockLevelViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        """
-        Warehouse context:
-        - ако има ?warehouse=<id>, той се използва
-        - иначе очаква warehouse да е в body
-        """
         warehouse_id = self.request.query_params.get("warehouse")
+
         if warehouse_id:
             try:
                 warehouse = Warehouse.objects.get(pk=warehouse_id, is_active=True)
             except Warehouse.DoesNotExist:
                 raise ValidationError({"warehouse": "Invalid or inactive warehouse."})
 
-            serializer.save(warehouse=warehouse)
+            product = serializer.validated_data.get("product")
+
+            if product and StockLevel.objects.filter(warehouse=warehouse, product=product).exists():
+                raise ValidationError({"sku": "This product is already added to this warehouse."})
+
+            try:
+                serializer.save(warehouse=warehouse)
+            except IntegrityError:
+                raise ValidationError({"sku": "This product is already added to this warehouse."})
+
             return
 
-        serializer.save()
+        warehouse = serializer.validated_data.get("warehouse")
+        product = serializer.validated_data.get("product")
+
+        if warehouse and product and StockLevel.objects.filter(warehouse=warehouse, product=product).exists():
+            raise ValidationError({"sku": "This product is already added to this warehouse."})
+
+        try:
+            serializer.save()
+        except IntegrityError:
+            raise ValidationError({"sku": "This product is already added to this warehouse."})
 
 
-class SearchViewSet(viewsets.ModelViewSet):
+class SearchViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = StockLevelSerializer
     permission_classes = [IsAuthenticated]
+    queryset = StockLevel.objects.select_related("product", "warehouse")
 
     @action(detail=False, methods=["get"], url_path="lookup")
-    def lookup(self, request, pk=None):
-        sku = (request.query_params.get("sku", "")).strip()
+    def lookup(self, request):
+        sku = (request.query_params.get("sku") or "").strip()
+        warehouse_id = request.query_params.get("warehouse")
+
         if not sku:
-            return Response({"error": "Invalid sku"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "sku is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not warehouse_id:
+            return Response({"error": "warehouse is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        product = Product.objects.filter(sku__iexact=sku).first()
+        sl = StockLevel.objects.select_related("product", "warehouse").filter(
+            warehouse_id=warehouse_id,
+            product__sku__iexact=sku,
+        ).first()
 
-        if not product:
-            return Response({"error": "Invalid product sku"}, status=status.HTTP_400_BAD_REQUEST)
+        if not sl:
+            return Response({"error": "stock level not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(self.get_serializer(product).data, status=status.HTTP_200_OK)
-
+        return Response(self.get_serializer(sl).data, status=status.HTTP_200_OK)

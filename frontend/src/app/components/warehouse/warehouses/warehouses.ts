@@ -48,6 +48,9 @@ export class WarehousesComponent implements OnInit {
     isDetailsOpen = false;
     selectedStock: StockLevel | null = null;
 
+    errMessage = '';
+
+
     constructor(private warehousesService: WarehousesService,private stockLevelsService: StockLevelsService) {}
 
     ngOnInit(): void {
@@ -123,14 +126,14 @@ export class WarehousesComponent implements OnInit {
             return;
         }
 
-        const exact = this.stockLevelsAll.filter(x => (x.product_sku || '').toLowerCase() === q.toLowerCase());
+        const exact = this.stockLevelsAll.filter(x => (x.sku || '').toLowerCase() === q.toLowerCase());
         if (exact.length) {
             this.stockLevels = exact;
             return;
         }
 
         this.stockLevels = this.stockLevelsAll.filter(x =>
-            (x.product_sku || '').toLowerCase().includes(q.toLowerCase())
+            (x.sku || '').toLowerCase().includes(q.toLowerCase())
         );
     }
 
@@ -156,7 +159,7 @@ export class WarehousesComponent implements OnInit {
                 this.closeAddToWarehouseDialog();
             },
             error: (err) => {
-                console.error(err);
+                this.errMessage = err?.error?.sku || 'Failed to add product.';
                 this.isAddSaving = false;
             },
         });

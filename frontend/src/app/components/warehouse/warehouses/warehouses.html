@@ -67,7 +67,7 @@
                                 <!--                                </div>-->
 
                                 <div class="product-content">
-                                    <div class="product-sku">{{ sl.product_sku }}</div>
+                                    <div class="product-sku">{{ sl.sku }}</div>
                                     <div class="product-name">{{ sl.product_name }}</div>
 
                                     <div class="product-price">
@@ -76,7 +76,9 @@
                                     </div>
 
                                     <div class="product-meta">
-                                        <span>Quantity: {{ sl.quantity }}</span>
+                                        <span class="qty" [class.qty-low]="sl.quantity <= sl.min_stock_level">
+                                            Quantity: {{ sl.quantity }}
+                                        </span>
                                         <span>Min: {{ sl.min_stock_level }}</span>
                                         <span>Unit: {{ sl.product_unit }}</span>
                                     </div>
@@ -117,6 +119,7 @@
         <div class="modal-wrap" role="dialog" aria-modal="true">
             <app-warehouse-add-product-dialog
                 [isSaving]="isAddSaving"
+                [errorMessage]="errMessage"
                 (cancel)="closeAddToWarehouseDialog()"
                 (submitForm)="submitAddToWarehouse($event)">
             </app-warehouse-add-product-dialog>

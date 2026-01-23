@@ -9,27 +9,33 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
+        @if (errorMessage) {
+            <div class="form-error">
+                {{ errorMessage }}
+            </div>
+        }
         <div class="section">
             <div class="section__title">Product</div>
 
             <div class="grid grid--2">
                 <div class="field">
-                    <label for="product">Product ID <span class="req">*</span></label>
+                    <label for="sku">Product SKU <span class="req">*</span></label>
                     <input
-                        id="product"
-                        type="number"
-                        formControlName="product"
-                        placeholder="e.g. 12"
-                        [class.invalid]="isInvalid('product')"
+                        id="sku"
+                        type="text"
+                        formControlName="sku"
+                        placeholder="e.g. SKU-1000"
+                        (input)="onAnyFieldInput()"
+                        [class.invalid]="isInvalid('sku')"
                     />
-                    @if (isInvalid('product')) {
-                        <small class="error">Valid product ID is required.</small>
+                    @if (isInvalid('sku')) {
+                        <small class="error">Valid SKU is required.</small>
                     }
                 </div>
 
                 <div class="field">
-                    <label for="quantity">Quantity</label>
-                    <input id="quantity" type="number" step="0.01" formControlName="quantity" />
+                    <label for="quantity" (input)="onAnyFieldInput()">Quantity</label>
+                    <input id="quantity" (input)="onAnyFieldInput()" type="number" step="0.01" formControlName="quantity" />
                 </div>
 
                 <div class="field">

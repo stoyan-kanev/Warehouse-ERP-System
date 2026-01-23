@@ -3,7 +3,7 @@
         <div class="dialog__title-wrap">
             <h2 class="dialog__title">Stock Details</h2>
             <p class="dialog__subtitle">
-                {{ stock.product_sku }} — {{ stock.product_name }}
+                {{ stock.sku }} — {{ stock.product_name }}
             </p>
         </div>
 
@@ -20,7 +20,7 @@
     <div class="section">
         <div class="section__title">Product</div>
         <div class="kv">
-            <div class="kv__row"><span>SKU</span><b>{{ stock.product_sku }}</b></div>
+            <div class="kv__row"><span>SKU</span><b>{{ stock.sku }}</b></div>
             <div class="kv__row"><span>Name</span><b>{{ stock.product_name }}</b></div>
             <div class="kv__row"><span>Unit</span><b>{{ stock.product_unit }}</b></div>
             <div class="kv__row"><span>Sell price</span><b>{{ stock.price_sell | number:'1.2-2' }} лв</b></div>
