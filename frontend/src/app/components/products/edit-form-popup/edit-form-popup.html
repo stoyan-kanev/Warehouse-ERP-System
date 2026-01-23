@@ -5,14 +5,12 @@
             <p class="dialog__subtitle">Update product details and save changes.</p>
         </div>
 
-        <!-- ако искаш close X бутон -->
         <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">
             ✕
         </button>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form">
-        <!-- Основни данни -->
         <div class="section">
             <div class="section__title">General</div>
 
@@ -20,8 +18,6 @@
                 <div class="field">
                     <label for="sku">SKU *</label>
                     <input id="sku" type="text" formControlName="sku" placeholder="SKU-1001" />
-                    <!-- placeholder за грешки -->
-                    <!-- <div class="error">SKU is required</div> -->
                 </div>
 
                 <div class="field">
@@ -47,28 +43,18 @@
                     accept="image/*"
                     (change)="onFileSelected($event)"
                 />
-                <!-- (по желание) показваш името -->
                 <small *ngIf="selectedFileName">{{ selectedFileName }}</small>
             </div>
             <div class="grid grid--2">
-                <div class="field">
-                    <label for="quantity">Quantity *</label>
-                    <input id="quantity" type="number" formControlName="quantity" />
-                </div>
 
                 <div class="field">
                     <label for="unit">Unit *</label>
                     <input id="unit" type="text" formControlName="unit" placeholder="pcs / kg / box" />
                 </div>
 
-                <div class="field">
-                    <label for="min_stock_level">Min Stock Quantity *</label>
-                    <input id="min_stock_level" type="number" formControlName="min_stock_level" />
-                </div>
             </div>
         </div>
 
-        <!-- Цени -->
         <div class="section">
             <div class="section__title">Pricing</div>
 
@@ -85,7 +71,6 @@
             </div>
         </div>
 
-        <!-- Статус -->
         <div class="section">
             <div class="section__title">Status</div>
 
@@ -95,11 +80,9 @@
             </div>
         </div>
 
-        <!-- Actions -->
         <div class="actions">
             <button type="button" class="btn ghost" (click)="onCancel()">Cancel</button>
 
-            <!-- опционално: бутон за delete, ако решиш -->
 
              <button type="button" class="btn danger" (click)="onDelete()">Deactivate</button>
 
