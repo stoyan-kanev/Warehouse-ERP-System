@@ -31,6 +31,7 @@ export class WarehousesService {
 
     constructor(private http: HttpClient) {}
 
+
     list(includeInactive = false): Observable<Warehouse[]> {
         let params = new HttpParams();
         if (includeInactive) params = params.set('include_inactive', 'true');

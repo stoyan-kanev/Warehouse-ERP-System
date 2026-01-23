@@ -1,7 +1,10 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 
+from product.models import Product
 from warehouse.models import Warehouse, StockLevel
 from warehouse.serializers import WarehouseSerializer, StockLevelSerializer
 
@@ -71,3 +74,21 @@ class StockLevelViewSet(viewsets.ModelViewSet):
             return
 
         serializer.save()
+
+
+class SearchViewSet(viewsets.ModelViewSet):
+    serializer_class = StockLevelSerializer
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=["get"], url_path="lookup")
+    def lookup(self, request, pk=None):
+        sku = (request.query_params.get("sku", "")).strip()
+        if not sku:
+            return Response({"error": "Invalid sku"}, status=status.HTTP_400_BAD_REQUEST)
+
+        product = Product.objects.filter(sku__exact=sku).first()
+        if not product:
+            return Response({"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(self.get_serializer(product).data, status=status.HTTP_200_OK)
+

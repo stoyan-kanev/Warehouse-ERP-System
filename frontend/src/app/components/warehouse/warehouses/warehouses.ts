@@ -8,6 +8,8 @@ import {FormsModule} from '@angular/forms';
 import {WarehouseAddProductDialog} from '../warehouse-add-product-dialog/warehouse-add-product-dialog';
 import {DecimalPipe} from '@angular/common';
 import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 
 
@@ -30,6 +32,10 @@ export class WarehousesComponent implements OnInit {
     warehouses: Warehouse[] = [];
     selectedWarehouseId: number | null = null;
 
+    skuQuery = '';
+    private sku$ = new Subject<string>();
+    private stockLevelsAll: StockLevel[] = [];
+
     stockLevels: StockLevel[] = [];
     isStockLoading = false;
 
@@ -46,6 +52,12 @@ export class WarehousesComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadWarehouses();
+        this.sku$
+            .pipe(debounceTime(200), distinctUntilChanged())
+            .subscribe((q) => {
+                this.skuQuery = q;
+                this.filterStockLevelsBySku();
+            });
     }
 
     loadWarehouses(selectFirst = true): void {
@@ -67,6 +79,7 @@ export class WarehousesComponent implements OnInit {
         this.selectedWarehouseId = Number.isFinite(id) ? id : null;
 
         if (this.selectedWarehouseId) {
+            this.clearSkuSearch();
             this.loadStockLevels(this.selectedWarehouseId);
         } else {
             this.stockLevels = [];
@@ -78,7 +91,8 @@ export class WarehousesComponent implements OnInit {
 
         this.stockLevelsService.listByWarehouse(warehouseId).subscribe({
             next: (rows) => {
-                this.stockLevels = rows;
+                this.stockLevelsAll = rows;
+                this.filterStockLevelsBySku();
                 this.isStockLoading = false;
             },
             error: (err) => {
@@ -87,6 +101,42 @@ export class WarehousesComponent implements OnInit {
             },
         });
     }
+    onSkuInput(value: string): void {
+        this.sku$.next(value.trim());
+    }
+
+// ако искаш Enter да “заключи” търсенето (без debounce)
+    applySkuSearch(): void {
+        this.skuQuery = this.skuQuery.trim();
+        this.filterStockLevelsBySku();
+    }
+
+    clearSkuSearch(): void {
+        this.skuQuery = '';
+        this.stockLevels = [...this.stockLevelsAll];
+    }
+
+    private filterStockLevelsBySku(): void {
+        const q = this.skuQuery.trim();
+
+        if (!q) {
+            this.stockLevels = [...this.stockLevelsAll];
+            return;
+        }
+
+        // Exact-first UX (warehouse-grade) + fallback to includes:
+        const exact = this.stockLevelsAll.filter(x => (x.product_sku || '').toLowerCase() === q.toLowerCase());
+        if (exact.length) {
+            this.stockLevels = exact;
+            return;
+        }
+
+        // fallback (ако ти харесва). Ако НЕ искаш fallback — махни това и покажи empty.
+        this.stockLevels = this.stockLevelsAll.filter(x =>
+            (x.product_sku || '').toLowerCase().includes(q.toLowerCase())
+        );
+    }
+
     openAddToWarehouseDialog(): void {
         if (!this.selectedWarehouseId) return;
         this.isAddOpen = true;
@@ -103,7 +153,8 @@ export class WarehousesComponent implements OnInit {
 
         this.stockLevelsService.createForWarehouse(this.selectedWarehouseId, payload).subscribe({
             next: (created) => {
-                this.stockLevels = [created, ...this.stockLevels];
+                this.stockLevelsAll = [created, ...this.stockLevelsAll];
+                this.filterStockLevelsBySku();
                 this.isAddSaving = false;
                 this.closeAddToWarehouseDialog();
             },
@@ -126,7 +177,10 @@ export class WarehousesComponent implements OnInit {
         if (!confirm(`Remove ${sl.product_name} from this warehouse?`)) return;
 
         this.stockLevelsService.remove(sl.id).subscribe({
-            next: () => this.stockLevels = this.stockLevels.filter(x => x.id !== sl.id),
+            next: () => {
+                this.stockLevelsAll = this.stockLevelsAll.filter(x => x.id !== sl.id);
+                this.filterStockLevelsBySku();
+            },
             error: (err) => console.error('Failed to remove stocklevel', err),
         });
     }

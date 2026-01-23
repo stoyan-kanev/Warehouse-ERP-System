@@ -28,6 +28,25 @@
                 }
             </select>
         </div>
+        <div class="sku-search">
+            <input
+                #skuInput
+                type="text"
+                class="sku-input"
+                placeholder="Scan or type SKU…"
+                [value]="skuQuery"
+                (input)="onSkuInput($any($event.target).value)"
+                (keydown.enter)="applySkuSearch(); skuInput.value=''; onSkuInput('')"
+                (keydown.escape)="clearSkuSearch()"
+                [disabled]="!selectedWarehouseId"
+            />
+
+            @if (skuQuery) {
+                <button mat-stroked-button class="sku-clear" (click)="clearSkuSearch()">
+                    Clear
+                </button>
+            }
+        </div>
     </div>
     <div class="products-grid">
         @if (!selectedWarehouseId) {

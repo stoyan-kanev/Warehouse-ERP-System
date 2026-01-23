@@ -2,6 +2,8 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+
 from product.models import Product, ProductFilter
 from rest_framework.generics import ListAPIView, CreateAPIView, get_object_or_404
 from rest_framework import filters, status
@@ -58,3 +60,8 @@ class ManageProductView(APIView):
             product.is_active = False
             product.save(update_fields=["is_active", "updated_at"])
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SearchProductView(ViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProductSerializer
