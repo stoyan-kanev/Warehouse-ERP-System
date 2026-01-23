@@ -57,6 +57,11 @@ class StockLevelSerializer(serializers.ModelSerializer):
         self._resolved_product = product
         return sku
 
+    def validate(self, attrs):
+        if self.instance is None and not (self.initial_data.get("sku") or "").strip():
+            raise serializers.ValidationError({"sku": "SKU is required."})
+        return attrs
+
     def create(self, validated_data):
         validated_data.pop("sku", None)
         product = getattr(self, "_resolved_product", None)

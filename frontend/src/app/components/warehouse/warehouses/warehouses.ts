@@ -126,14 +126,14 @@ export class WarehousesComponent implements OnInit {
             return;
         }
 
-        const exact = this.stockLevelsAll.filter(x => (x.sku || '').toLowerCase() === q.toLowerCase());
+        const exact = this.stockLevelsAll.filter(x => (x.product_sku || '').toLowerCase() === q.toLowerCase());
         if (exact.length) {
             this.stockLevels = exact;
             return;
         }
 
         this.stockLevels = this.stockLevelsAll.filter(x =>
-            (x.sku || '').toLowerCase().includes(q.toLowerCase())
+            (x.product_sku || '').toLowerCase().includes(q.toLowerCase())
         );
     }
 
@@ -191,7 +191,11 @@ export class WarehousesComponent implements OnInit {
     closeCreate(): void {
         this.isCreateOpen = false;
     }
-
+    onStockUpdated(updated: StockLevel): void {
+        this.stockLevelsAll = this.stockLevelsAll.map(x => x.id === updated.id ? updated : x);
+        this.filterStockLevelsBySku();
+        this.selectedStock = updated;
+    }
     createWarehouse(payload: WarehouseCreatePayload): void {
         this.isSaving = true;
 

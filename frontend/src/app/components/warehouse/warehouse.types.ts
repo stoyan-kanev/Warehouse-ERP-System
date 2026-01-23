@@ -1,7 +1,7 @@
 export type StockLevel = {
     id: number;
     product: number;
-    sku: string;
+    product_sku: string
     product_name: string;
     product_unit: string;
     price_sell: string;
@@ -16,7 +16,7 @@ export type StockLevel = {
 };
 
 export type StockLevelCreatePayload = {
-    sku:string;
+    sku: string;
     quantity: string;
     min_stock_level: string;
 };

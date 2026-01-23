@@ -55,7 +55,7 @@ class ManageProductView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk=None, *args, **kwargs):
+    def patch(self, request, pk=None, *args, **kwargs):
         product = get_object_or_404(Product, pk=pk)
         serializer = ProductSerializer(product, data=request.data, partial=False, context={"request": request})
 
@@ -72,7 +72,7 @@ class ManageProductView(APIView):
             return Response(out.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
     def delete(self, request, pk=None, *args, **kwargs):
         product = get_object_or_404(Product, pk=pk)
         if product.is_active:

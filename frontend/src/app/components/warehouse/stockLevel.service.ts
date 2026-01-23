@@ -27,9 +27,10 @@ export class StockLevelsService {
         return this.http.post<StockLevel>(this.baseUrl, payload, { params, withCredentials: true });
     }
 
-    update(id: number, payload: Partial<StockLevelCreatePayload>): Observable<StockLevel> {
+    update(id: number, payload: { quantity: string; min_stock_level: string }) {
         return this.http.patch<StockLevel>(`${this.baseUrl}${id}/`, payload, { withCredentials: true });
     }
+
 
     remove(id: number): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}${id}/`, { withCredentials: true });
