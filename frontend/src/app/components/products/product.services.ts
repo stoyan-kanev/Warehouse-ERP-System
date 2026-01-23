@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {PaginatedProducts, PaginatedResponse, Product} from './product.types';
-import {Observable, tap} from 'rxjs';
+import {map, Observable, tap} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
@@ -20,6 +20,13 @@ export class ProductService {
         return this._pagination;
     }
     constructor(private http: HttpClient) {}
+
+    searchBySku(sku: string) {
+        return this.http.get<Product>(`${environment.apiUrl}/api/v1/product/search/`, {
+            params: { sku },
+            withCredentials: true,
+        });
+    }
 
     loadProducts(page: number = 1): Observable<PaginatedProducts> {
         return this.http

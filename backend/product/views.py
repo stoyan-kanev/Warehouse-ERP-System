@@ -1,3 +1,4 @@
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -65,3 +66,23 @@ class ManageProductView(APIView):
 class SearchProductView(ViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ProductSerializer
+
+    @action(detail=False, methods=["GET"], url_path="search")
+    def search(self, request):
+        sku = (request.query_params.get("sku") or "").strip()
+
+        if not sku:
+            return Response(
+                {"error": "sku query param is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Partial search sku__icontains=sku
+        product = Product.objects.filter(sku__iexact=sku).first()
+        if not product:
+            return Response(
+                {"error": "product not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        data = self.serializer_class(product, context={"request": request}).data
+        return Response(data, status=status.HTTP_200_OK)

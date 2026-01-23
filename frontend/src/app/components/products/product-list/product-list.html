@@ -7,11 +7,27 @@
         >
             + Create Product
         </button>
+        <div class="sku-search">
+            <input
+                class="sku-input"
+                type="text"
+                placeholder="Scan or type SKU…"
+                [value]="skuQuery"
+                (input)="onSkuInput($any($event.target).value)"
+                (keydown.enter)="applySkuSearch()"
+                (keydown.escape)="clearSkuSearch()"
+            />
 
+            @if (skuQuery) {
+                <button mat-stroked-button class="sku-clear" (click)="clearSkuSearch()">
+                    Clear
+                </button>
+            }
+        </div>
     </div>
 
     <div class="products-grid">
-        @for (p of products; track p.id) {
+        @for (p of filteredProducts; track p.id) {
 
             <div class="product-card" [class.non-active]="!p.is_active">
                 <div class="product-wrap">
@@ -58,23 +74,25 @@
         }
     </div>
 
-    <div class="pagination-footer">
-        <button
-            class="nav-btn"
-            (click)="loadProducts(currentPage - 1)"
-            [disabled]="!pagination.previous"
-        >
-            Prev
-        </button>
 
-        <span class="total">Total: {{ pagination.count }}</span>
+    @if (!skuQuery) {
+        <div class="pagination-footer">
+            <button class="nav-btn" (click)="loadProducts(currentPage - 1)" [disabled]="!pagination.previous">
+                Prev
+            </button>
 
-        <button
-            class="nav-btn"
-            (click)="loadProducts(currentPage + 1)"
-            [disabled]="!pagination.next"
-        >
-            Next
-        </button>
-    </div>
+            <span class="total">Total: {{ pagination.count }}</span>
+
+            <button class="nav-btn" (click)="loadProducts(currentPage + 1)" [disabled]="!pagination.next">
+                Next
+            </button>
+        </div>
+    } @else {
+        @if (isSearching) {
+            <div class="empty-state">Searching...</div>
+        } @else if (searchError && filteredProducts.length === 0) {
+            <div class="empty-state">{{ searchError }}</div>
+        }
+    }
+
 </div>

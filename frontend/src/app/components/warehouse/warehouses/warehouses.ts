@@ -105,7 +105,6 @@ export class WarehousesComponent implements OnInit {
         this.sku$.next(value.trim());
     }
 
-// ако искаш Enter да “заключи” търсенето (без debounce)
     applySkuSearch(): void {
         this.skuQuery = this.skuQuery.trim();
         this.filterStockLevelsBySku();
@@ -124,14 +123,12 @@ export class WarehousesComponent implements OnInit {
             return;
         }
 
-        // Exact-first UX (warehouse-grade) + fallback to includes:
         const exact = this.stockLevelsAll.filter(x => (x.product_sku || '').toLowerCase() === q.toLowerCase());
         if (exact.length) {
             this.stockLevels = exact;
             return;
         }
 
-        // fallback (ако ти харесва). Ако НЕ искаш fallback — махни това и покажи empty.
         this.stockLevels = this.stockLevelsAll.filter(x =>
             (x.product_sku || '').toLowerCase().includes(q.toLowerCase())
         );

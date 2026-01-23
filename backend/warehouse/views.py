@@ -86,9 +86,10 @@ class SearchViewSet(viewsets.ModelViewSet):
         if not sku:
             return Response({"error": "Invalid sku"}, status=status.HTTP_400_BAD_REQUEST)
 
-        product = Product.objects.filter(sku__exact=sku).first()
+        product = Product.objects.filter(sku__iexact=sku).first()
+
         if not product:
-            return Response({"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid product sku"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(self.get_serializer(product).data, status=status.HTTP_200_OK)
 
