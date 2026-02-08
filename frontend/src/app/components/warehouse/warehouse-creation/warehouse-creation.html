@@ -3,6 +3,9 @@
         <div class="dialog__title-wrap">
             <h2 class="dialog__title">Add Warehouse</h2>
             <p class="dialog__subtitle">Create a new warehouse and activate it for stock operations.</p>
+            @if (errorMessage) {
+                <div class="error">{{ errorMessage }}</div>
+            }
         </div>
 
         <button type="button" class="icon-btn" (click)="onCancel()" aria-label="Close">
@@ -21,6 +24,7 @@
                     <input
                         id="name"
                         type="text"
+                        (input)="clearError.emit()"
                         formControlName="name"
                         placeholder="Main Warehouse"
                         [class.invalid]="isInvalid('name')"
@@ -35,6 +39,7 @@
                     <label for="location">Location <span class="req">*</span></label>
                     <input
                         id="location"
+                        (input)="clearError.emit()"
                         type="text"
                         formControlName="location"
                         placeholder="Sofia, Bulgaria"

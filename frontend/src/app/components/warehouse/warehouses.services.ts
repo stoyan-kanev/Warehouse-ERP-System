@@ -48,13 +48,13 @@ export class WarehousesService {
     }
 
     update(id: number, payload: Partial<WarehouseCreatePayload>): Observable<Warehouse> {
-        return this.http.patch<Warehouse>(`${this.baseUrl}${id}`, payload, {
+        return this.http.patch<Warehouse>(`${this.baseUrl}${id}/`, payload, {
             withCredentials: true,
         });
     }
 
     deactivate(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}${id}`, {
+        return this.http.delete<void>(`${this.baseUrl}${id}/`, {
             withCredentials: true,
         });
     }

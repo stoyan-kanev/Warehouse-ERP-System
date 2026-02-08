@@ -47,6 +47,27 @@
                 </button>
             }
         </div>
+        <div class="edit-warehouse">
+            <button
+                mat-stroked-button
+                class="edit-btn"
+                [disabled]="!selectedWarehouseId"
+                (click)="openEditWarehouse()"
+            >
+                Edit Warehouse
+            </button>
+
+            <button
+                mat-stroked-button
+                class="danger-btn"
+                color="warn"
+                [disabled]="!selectedWarehouseId"
+                (click)="deactivateSelectedWarehouse()"
+            >
+                Deactivate
+            </button>
+
+        </div>
     </div>
     <div class="products-grid">
         @if (!selectedWarehouseId) {
@@ -90,11 +111,15 @@
                                         (click)="openStockDetails(sl)">
                                     Details
                                 </button>
-
                                 <button class="danger-btn" mat-stroked-button color="warn"
                                         (click)="removeFromWarehouse(sl)">
                                     Remove
                                 </button>
+                                <button class="edit-btn" mat-stroked-button color="primary"
+                                        (click)="openShipForm(sl)">
+                                    Ship
+                                </button>
+
                             </div>
                         </div>
                     }
@@ -113,6 +138,21 @@
             </app-warehouse-creation>
         </div>
     }
+    @if (isEditOpen && editingWarehouse) {
+        <div class="modal-backdrop" (click)="closeEditWarehouse()"></div>
+
+        <div class="modal-wrap" role="dialog" aria-modal="true">
+            <app-warehouse-creation
+                [isSaving]="isEditSaving"
+                [initialValue]="editingWarehouse"
+                [errorMessage]="warehouseError"
+                (clearError)="warehouseError = null"
+                (cancel)="closeEditWarehouse()"
+                (submitForm)="submitEditWarehouse($event)">
+            </app-warehouse-creation>
+        </div>
+    }
+
     @if (isAddOpen) {
         <div class="modal-backdrop" (click)="closeAddToWarehouseDialog()"></div>
 

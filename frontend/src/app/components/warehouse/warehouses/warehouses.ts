@@ -8,13 +8,12 @@ import {FormsModule} from '@angular/forms';
 import {WarehouseAddProductDialog} from '../warehouse-add-product-dialog/warehouse-add-product-dialog';
 import {DecimalPipe} from '@angular/common';
 import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
 
 @Component({
-  selector: 'app-warehouses',
+    selector: 'app-warehouses',
     imports: [
         MatButton,
         WarehouseCreation,
@@ -25,8 +24,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
         WarehouseDetailProductDialog,
 
     ],
-  templateUrl: './warehouses.html',
-  styleUrl: './warehouses.css',
+    standalone: true,
+    templateUrl: './warehouses.html',
+    styleUrl: './warehouses.css',
 })
 export class WarehousesComponent implements OnInit {
     warehouses: Warehouse[] = [];
@@ -48,10 +48,17 @@ export class WarehousesComponent implements OnInit {
     isDetailsOpen = false;
     selectedStock: StockLevel | null = null;
 
+    isEditOpen = false;
+    isEditSaving = false;
+    editingWarehouse: Warehouse | null = null;
+    warehouseError: string | null = null;
+
+
     errMessage = '';
 
 
-    constructor(private warehousesService: WarehousesService,private stockLevelsService: StockLevelsService) {}
+    constructor(private warehousesService: WarehousesService, private stockLevelsService: StockLevelsService) {
+    }
 
     ngOnInit(): void {
         this.loadWarehouses();
@@ -104,6 +111,7 @@ export class WarehousesComponent implements OnInit {
             },
         });
     }
+
     onSkuInput(value: string): void {
         this.sku$.next(value.trim());
     }
@@ -164,6 +172,79 @@ export class WarehousesComponent implements OnInit {
             },
         });
     }
+
+    openEditWarehouse(): void {
+        if (!this.selectedWarehouseId) return;
+
+        const w = this.warehouses.find(x => x.id === this.selectedWarehouseId) || null;
+        if (!w) return;
+
+        this.editingWarehouse = w;
+        this.warehouseError = null;
+        this.isEditOpen = true;
+    }
+
+    closeEditWarehouse(): void {
+        this.isEditOpen = false;
+        this.isEditSaving = false;
+        this.editingWarehouse = null;
+        this.warehouseError = null;
+    }
+
+    submitEditWarehouse(payload: WarehouseCreatePayload): void {
+        if (!this.editingWarehouse) return;
+
+        this.isEditSaving = true;
+        this.warehouseError = null;
+
+        this.warehousesService.update(this.editingWarehouse.id, payload).subscribe({
+            next: (updated) => {
+                this.isEditSaving = false;
+
+                // update local list
+                this.warehouses = this.warehouses.map(w => w.id === updated.id ? updated : w);
+
+                // keep selected
+                this.selectedWarehouseId = updated.id;
+
+                this.closeEditWarehouse();
+            },
+            error: (err) => {
+                this.isEditSaving = false;
+                // normalize error to string
+                const raw = err?.error?.name?.[0] || err?.error?.location?.[0] || err?.error?.detail || err?.error?.error;
+                this.warehouseError = Array.isArray(raw) ? raw[0] : (raw || 'Update failed.');
+            },
+        });
+    }
+
+    deactivateSelectedWarehouse(): void {
+        if (!this.selectedWarehouseId) return;
+
+        const w = this.warehouses.find(x => x.id === this.selectedWarehouseId);
+        const label = w ? `${w.name} — ${w.location}` : `#${this.selectedWarehouseId}`;
+
+        if (!confirm(`Deactivate warehouse ${label}?`)) return;
+
+        this.warehousesService.deactivate(this.selectedWarehouseId).subscribe({
+            next: () => {
+                // remove from list locally
+                this.warehouses = this.warehouses.filter(x => x.id !== this.selectedWarehouseId);
+
+                // reset selection
+                this.selectedWarehouseId = this.warehouses.length ? this.warehouses[0].id : null;
+
+                // reload stock
+                if (this.selectedWarehouseId) this.loadStockLevels(this.selectedWarehouseId);
+                else this.stockLevels = [];
+
+                // optional: if edit modal open
+                this.closeEditWarehouse();
+            },
+            error: (err) => console.error('Failed to deactivate warehouse', err),
+        });
+    }
+
     openStockDetails(sl: StockLevel): void {
         this.selectedStock = sl;
         this.isDetailsOpen = true;
@@ -173,6 +254,7 @@ export class WarehousesComponent implements OnInit {
         this.isDetailsOpen = false;
         this.selectedStock = null;
     }
+
     removeFromWarehouse(sl: StockLevel): void {
         if (!confirm(`Remove ${sl.product_name} from this warehouse?`)) return;
 
@@ -184,6 +266,7 @@ export class WarehousesComponent implements OnInit {
             error: (err) => console.error('Failed to remove stocklevel', err),
         });
     }
+
     openCreate(): void {
         this.isCreateOpen = true;
     }
@@ -191,11 +274,13 @@ export class WarehousesComponent implements OnInit {
     closeCreate(): void {
         this.isCreateOpen = false;
     }
+
     onStockUpdated(updated: StockLevel): void {
         this.stockLevelsAll = this.stockLevelsAll.map(x => x.id === updated.id ? updated : x);
         this.filterStockLevelsBySku();
         this.selectedStock = updated;
     }
+
     createWarehouse(payload: WarehouseCreatePayload): void {
         this.isSaving = true;
 
@@ -204,8 +289,9 @@ export class WarehousesComponent implements OnInit {
                 this.isSaving = false;
                 this.closeCreate();
 
-                this.loadWarehouses(false);
+                this.warehouses = [created, ...this.warehouses];
                 this.selectedWarehouseId = created.id;
+                this.clearSkuSearch();
                 this.loadStockLevels(created.id);
             },
             error: (err) => {
@@ -213,5 +299,9 @@ export class WarehousesComponent implements OnInit {
                 this.isSaving = false;
             },
         });
+    }
+
+    openShipForm(sl: StockLevel) {
+
     }
 }

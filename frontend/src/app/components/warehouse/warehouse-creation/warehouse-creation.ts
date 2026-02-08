@@ -1,5 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Warehouse} from '../warehouses.services';
 
 
 export type WarehouseCreatePayload = {
@@ -19,7 +20,11 @@ export type WarehouseCreatePayload = {
 export class WarehouseCreation {
     @Input() isSaving = false;
 
-    @Input() initialValue?: Partial<WarehouseCreatePayload>;
+
+    @Input() initialValue: Partial<Warehouse> | null = null;
+    @Input() errorMessage: string | null = null;
+    @Output() clearError = new EventEmitter<void>();
+
 
     @Output() cancel = new EventEmitter<void>();
     @Output() submitForm = new EventEmitter<WarehouseCreatePayload>();
@@ -33,14 +38,25 @@ export class WarehouseCreation {
         });
     }
 
-    ngOnInit(): void {
-        if (this.initialValue) {
-            this.form.patchValue({
-                name: this.initialValue.name ?? '',
-                location: this.initialValue.location ?? '',
-                is_active: this.initialValue.is_active ?? true,
-            });
+    ngOnChanges(changes: SimpleChanges): void {
+        if (!changes['initialValue']) return;
+        const v = this.initialValue;
+
+        // ако е create mode -> reset
+        if (!v) {
+            this.form.reset({ name: '', location: '', is_active: true }, { emitEvent: false });
+            return;
         }
+
+        // edit mode -> patch
+        this.form.patchValue(
+            {
+                name: v.name ?? '',
+                location: v.location ?? '',
+                is_active: v.is_active ?? true,
+            },
+            { emitEvent: false }
+        );
     }
 
     isInvalid(controlName: keyof WarehouseCreatePayload): boolean {

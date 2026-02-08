@@ -198,7 +198,7 @@
 /* actions */
 .card-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 10px;
     margin-top: auto;
 }
@@ -280,7 +280,11 @@
 .qty {
     font-weight: 650;
 }
-
+.edit-warehouse{
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+}
 .qty-low {
     color: var(--red);
     background: rgba(239, 68, 68, 0.12);
