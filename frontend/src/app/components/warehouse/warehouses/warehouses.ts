@@ -10,6 +10,7 @@ import {DecimalPipe} from '@angular/common';
 import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-ship-form';
 
 
 @Component({
@@ -22,6 +23,7 @@ import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
         WarehouseAddProductDialog,
         DecimalPipe,
         WarehouseDetailProductDialog,
+        WarehouseShipForm,
 
     ],
     standalone: true,
@@ -52,6 +54,8 @@ export class WarehousesComponent implements OnInit {
     isEditSaving = false;
     editingWarehouse: Warehouse | null = null;
     warehouseError: string | null = null;
+
+    isShipmentOpen = false;
 
 
     errMessage = '';
@@ -301,7 +305,12 @@ export class WarehousesComponent implements OnInit {
         });
     }
 
-    openShipForm(sl: StockLevel) {
 
+    openCreateShipment() {
+        this.isShipmentOpen = true;
+    }
+
+    closeShipForm(){
+        this.isShipmentOpen = false;
     }
 }

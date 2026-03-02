@@ -11,6 +11,9 @@
         >
             + Add Product to Warehouse
         </button>
+        <button mat-flat-button class="create-btn" (click)="openCreateShipment()">
+            + Create Shipment
+        </button>
         <div class="select-wrap">
             <select
                 id="warehouse"
@@ -115,10 +118,7 @@
                                         (click)="removeFromWarehouse(sl)">
                                     Remove
                                 </button>
-                                <button class="edit-btn" mat-stroked-button color="primary"
-                                        (click)="openShipForm(sl)">
-                                    Ship
-                                </button>
+
 
                             </div>
                         </div>
@@ -176,4 +176,19 @@
             </app-warehouse-detail-product-dialog>
         </div>
     }
+
+    @if (isShipmentOpen) {
+        <div class="modal-backdrop" (click)="closeShipForm()"></div>
+
+        <div class="modal-wrap" role="dialog" aria-modal="true">
+            <app-warehouse-ship-form
+                [warehouses]="warehouses"
+                [stocks]="stockLevels"
+                (close)='closeShipForm()'>
+<!--                (submitShipment)="createShipment($event)"-->
+            </app-warehouse-ship-form>
+        </div>
+    }
+
+
 </div>

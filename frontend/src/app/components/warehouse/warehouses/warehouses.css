@@ -55,7 +55,7 @@
     transform: translateY(1px);
 }
 
-/* dropdown (standard css, matches theme) */
+/* dropdown */
 .toolbar select {
     appearance: none;
     min-width: 280px;
@@ -203,19 +203,16 @@
     margin-top: auto;
 }
 
-/* normalize mat-stroked-button a bit */
 .edit-btn {
     width: 100%;
     border-radius: 999px !important;
 }
 
-/* make warn look consistent */
 .danger-btn {
     width: 100%;
     border-radius: 999px !important;
 }
 
-/* empty state */
 .empty-state {
     grid-column: 1 / -1;
     padding: 16px;

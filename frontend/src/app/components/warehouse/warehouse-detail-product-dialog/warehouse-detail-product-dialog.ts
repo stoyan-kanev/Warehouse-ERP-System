@@ -37,7 +37,6 @@ export class WarehouseDetailProductDialog implements OnChanges{
     ngOnChanges(changes: SimpleChanges): void {
         if (!changes['stock']?.currentValue) return;
 
-        // когато се отвори за нов продукт -> излизаме от edit mode
         this.isEditing = false;
         this.errorMessage = null;
 
@@ -58,7 +57,6 @@ export class WarehouseDetailProductDialog implements OnChanges{
         this.isEditing = true;
         this.errorMessage = null;
 
-        // safety: sync form с current stock (ако е обновяван отвън)
         this.form.patchValue(
             {
                 quantity: this.stock.quantity ?? '0.00',
@@ -72,7 +70,6 @@ export class WarehouseDetailProductDialog implements OnChanges{
         this.isEditing = false;
         this.errorMessage = null;
 
-        // връщаме form-а към текущите стойности
         this.form.patchValue(
             {
                 quantity: this.stock.quantity ?? '0.00',

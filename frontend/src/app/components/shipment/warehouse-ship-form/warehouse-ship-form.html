@@ -1,0 +1,113 @@
+<div class="ship-dialog-wrapper">
+    <div class="wrap">
+        <h1>Create Shipment</h1>
+        <button class="close-btn" type="button" (click)="onClose()">X</button>
+    </div>
+
+    <form class="form" (ngSubmit)="onSubmit()" #f="ngForm">
+
+        <div class="row">
+            <label class="label">Destination</label>
+            <div class="segmented">
+                <button type="button" class="seg-btn" [class.active]="destinationType==='warehouse'" (click)="setDestination('warehouse')">
+                    To warehouse
+                </button>
+                <button type="button" class="seg-btn" [class.active]="destinationType==='client'" (click)="setDestination('client')">
+                    To client
+                </button>
+            </div>
+        </div>
+
+        <div class="row" *ngIf="destinationType === 'warehouse'">
+            <label class="label">To warehouse</label>
+            <select class="control" name="toWarehouseId" [(ngModel)]="toWarehouseId" required>
+                <option [ngValue]="null" disabled>Select warehouse</option>
+                <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w.name }}</option>
+            </select>
+        </div>
+
+        <div class="row" *ngIf="destinationType === 'client'">
+            <label class="label">Client address</label>
+            <input class="control" name="clientAddress" [(ngModel)]="clientAddress" minlength="10" required />
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row">
+            <label class="label">Add product</label>
+
+            <div class="combo" (focusin)="openDropdown()" (focusout)="onComboBlur($event)">
+                <input
+                    class="control"
+                    name="productSearch"
+                    [(ngModel)]="productSearch"
+                    (input)="onSearchChange()"
+                    (keydown)="onSearchKeyDown($event)"
+                    autocomplete="off"
+                    placeholder="Search by SKU or name..."
+                />
+
+                <div class="dropdown" *ngIf="dropdownOpen">
+                    <div class="dropdown-header">
+                        <span>Products</span>
+                        <span class="muted">{{ filteredProducts.length }} shown</span>
+                    </div>
+
+                    <div class="dropdown-list">
+                        <button
+                            type="button"
+                            class="dd-item"
+                            *ngFor="let p of filteredProducts; let i = index"
+                            [class.active]="i === activeIndex"
+                            (mousedown)="selectProduct(p)"
+                        >
+                            <div class="dd-left">
+                                <div class="sku">{{ p.sku }}</div>
+                                <div class="name">{{ p.name }}</div>
+                                <div class="muted">Unit: {{ p.unit }}</div>
+                            </div>
+
+                            <div class="dd-right">
+                                <div class="stock">Stock: {{ p.stockQty }}</div>
+                                <div class="muted">Sell: {{ p.priceSell }}</div>
+                            </div>
+                        </button>
+
+                        <div class="empty" *ngIf="filteredProducts.length === 0">
+                            No products match your search.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="items">
+            <div class="items-header">
+                <h2>Shipment items</h2>
+                <div class="muted" *ngIf="items.length === 0">No items yet.</div>
+            </div>
+
+            <div class="item-row" *ngFor="let it of items; let i = index">
+                <div class="meta">
+                    <div class="sku">{{ it.sku }}</div>
+                    <div class="name">{{ it.name }}</div>
+                    <div class="muted">Unit: {{ it.unit }} • Available: {{ it.stockQty }}</div>
+                </div>
+
+                <div class="qty">
+                    <button type="button" class="qty-btn" (click)="decQty(i)">-</button>
+                    <input class="qty-input" type="number" [value]="it.qty" (input)="setQty(i, $any($event.target).value)" min="1" />
+                    <button type="button" class="qty-btn" (click)="incQty(i)">+</button>
+                </div>
+
+                <button type="button" class="remove" (click)="removeItem(i)">Remove</button>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="primary" type="submit" [disabled]="!canSubmit()">Create shipment</button>
+            <button class="secondary" type="button" (click)="onClose()">Cancel</button>
+        </div>
+
+    </form>
+</div>
