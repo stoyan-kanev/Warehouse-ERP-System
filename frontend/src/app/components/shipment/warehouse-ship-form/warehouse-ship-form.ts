@@ -34,7 +34,7 @@ export class WarehouseShipForm implements OnChanges {
     @Input() stocks: StockLevel[] | undefined;
 
     // Optional: pass available warehouses from parent (for "To warehouse" selection)
-    @Input() warehouses: Array<{ id: number; name: string }> = [];
+    @Input() warehouses: Array<{ id: number; name: string ,location:string}> = [];
 
     @Output() close = new EventEmitter<void>();
     @Output() submitShipment = new EventEmitter<ShipmentPayload>();

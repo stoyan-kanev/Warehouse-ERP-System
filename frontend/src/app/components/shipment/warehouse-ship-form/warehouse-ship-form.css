@@ -77,7 +77,7 @@
 
 .dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(80% + 8px);
     left: 0;
     right: 0;
     border: 1px solid rgba(255,255,255,0.18);

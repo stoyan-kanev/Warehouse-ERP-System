@@ -9,10 +9,12 @@
         <div class="row">
             <label class="label">Destination</label>
             <div class="segmented">
-                <button type="button" class="seg-btn" [class.active]="destinationType==='warehouse'" (click)="setDestination('warehouse')">
+                <button type="button" class="seg-btn" [class.active]="destinationType==='warehouse'"
+                        (click)="setDestination('warehouse')">
                     To warehouse
                 </button>
-                <button type="button" class="seg-btn" [class.active]="destinationType==='client'" (click)="setDestination('client')">
+                <button type="button" class="seg-btn" [class.active]="destinationType==='client'"
+                        (click)="setDestination('client')">
                     To client
                 </button>
             </div>
@@ -22,13 +24,13 @@
             <label class="label">To warehouse</label>
             <select class="control" name="toWarehouseId" [(ngModel)]="toWarehouseId" required>
                 <option [ngValue]="null" disabled>Select warehouse</option>
-                <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w.name }}</option>
+                <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w.name }} - {{ w.location }}</option>
             </select>
         </div>
 
         <div class="row" *ngIf="destinationType === 'client'">
             <label class="label">Client address</label>
-            <input class="control" name="clientAddress" [(ngModel)]="clientAddress" minlength="10" required />
+            <input class="control" name="clientAddress" [(ngModel)]="clientAddress" minlength="10" required/>
         </div>
 
         <div class="divider"></div>
@@ -96,7 +98,8 @@
 
                 <div class="qty">
                     <button type="button" class="qty-btn" (click)="decQty(i)">-</button>
-                    <input class="qty-input" type="number" [value]="it.qty" (input)="setQty(i, $any($event.target).value)" min="1" />
+                    <input class="qty-input" type="number" [value]="it.qty"
+                           (input)="setQty(i, $any($event.target).value)" min="1"/>
                     <button type="button" class="qty-btn" (click)="incQty(i)">+</button>
                 </div>
 

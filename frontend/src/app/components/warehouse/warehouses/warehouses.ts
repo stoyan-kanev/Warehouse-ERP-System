@@ -33,7 +33,7 @@ import {WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-sh
 export class WarehousesComponent implements OnInit {
     warehouses: Warehouse[] = [];
     selectedWarehouseId: number | null = null;
-
+    availableWarehouses: Warehouse[] = [];
     skuQuery = '';
     private sku$ = new Subject<string>();
     private stockLevelsAll: StockLevel[] = [];
@@ -72,7 +72,9 @@ export class WarehousesComponent implements OnInit {
                 this.skuQuery = q;
                 this.filterStockLevelsBySku();
             });
+
     }
+
 
     loadWarehouses(selectFirst = true): void {
         this.warehousesService.list(false).subscribe({
@@ -82,6 +84,8 @@ export class WarehousesComponent implements OnInit {
                 if (selectFirst && this.selectedWarehouseId == null && this.warehouses.length) {
                     this.selectedWarehouseId = this.warehouses[0].id;
                     this.onWarehouseChange(this.selectedWarehouseId);
+                    this.availableWarehouses = this.warehouses.filter(w=> w.id != this.selectedWarehouseId);
+
                 }
             },
             error: (err) => console.error('Failed to load warehouses', err),
@@ -95,6 +99,8 @@ export class WarehousesComponent implements OnInit {
         if (this.selectedWarehouseId) {
             this.clearSkuSearch();
             this.loadStockLevels(this.selectedWarehouseId);
+            this.availableWarehouses = this.warehouses.filter(w=> w.id != this.selectedWarehouseId);
+
         } else {
             this.stockLevels = [];
         }
