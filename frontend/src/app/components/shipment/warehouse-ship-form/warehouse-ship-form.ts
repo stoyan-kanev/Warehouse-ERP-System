@@ -17,7 +17,7 @@ type ShipProductVM = {
 
 type ShipItemVM = ShipProductVM & { qty: number };
 
-type ShipmentPayload = {
+export type ShipmentPayload = {
     destination_type: 'warehouse' | 'client';
     to_warehouse_id: number | null;
     client_address: string | null;
@@ -219,9 +219,12 @@ export class WarehouseShipForm implements OnChanges {
         if (!it) return;
 
         const n = Number(raw);
+
         if (!Number.isFinite(n)) return;
 
-        const clamped = Math.max(1, Math.floor(n));
+        const rounded = Math.round(n * 100) / 100;
+        const clamped = Math.max(0, rounded);
+
         it.qty = Math.min(clamped, it.stockQty || 999999);
     }
 

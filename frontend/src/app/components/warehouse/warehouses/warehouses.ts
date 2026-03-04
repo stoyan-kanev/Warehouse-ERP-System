@@ -10,7 +10,7 @@ import {DecimalPipe} from '@angular/common';
 import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
-import {WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-ship-form';
+import {ShipmentPayload, WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-ship-form';
 
 
 @Component({
@@ -318,5 +318,10 @@ export class WarehousesComponent implements OnInit {
 
     closeShipForm(){
         this.isShipmentOpen = false;
+    }
+
+    createShipment($event: ShipmentPayload) {
+        console.log($event);
+
     }
 }

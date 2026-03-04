@@ -183,9 +183,9 @@
         <div class="modal-wrap" role="dialog" aria-modal="true">
             <app-warehouse-ship-form
                 [warehouses]="availableWarehouses"
+                (submitShipment)="createShipment($event)"
                 [stocks]="stockLevels"
                 (close)='closeShipForm()'>
-<!--                (submitShipment)="createShipment($event)"-->
             </app-warehouse-ship-form>
         </div>
     }

@@ -98,8 +98,14 @@
 
                 <div class="qty">
                     <button type="button" class="qty-btn" (click)="decQty(i)">-</button>
-                    <input class="qty-input" type="number" [value]="it.qty"
-                           (input)="setQty(i, $any($event.target).value)" min="1"/>
+                    <input
+                        class="qty-input"
+                        type="number"
+                        [value]="it.qty"
+                        (input)="setQty(i, $any($event.target).value)"
+                        min="0"
+                        step="0.01"
+                    />
                     <button type="button" class="qty-btn" (click)="incQty(i)">+</button>
                 </div>
 
