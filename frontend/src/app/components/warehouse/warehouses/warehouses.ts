@@ -11,6 +11,7 @@ import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/w
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 import {ShipmentPayload, WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-ship-form';
+import {ShipmentService} from '../../shipment/shipment.service';
 
 
 @Component({
@@ -61,8 +62,11 @@ export class WarehousesComponent implements OnInit {
     errMessage = '';
 
 
-    constructor(private warehousesService: WarehousesService, private stockLevelsService: StockLevelsService) {
-    }
+    constructor(
+        private warehousesService: WarehousesService,
+        private stockLevelsService: StockLevelsService,
+        private shipmentServices:ShipmentService
+    ){}
 
     ngOnInit(): void {
         this.loadWarehouses();
@@ -321,7 +325,9 @@ export class WarehousesComponent implements OnInit {
     }
 
     createShipment($event: ShipmentPayload) {
-        console.log($event);
+        if ($event) {
+            this.shipmentServices.createShipment($event)
+        }
 
     }
 }

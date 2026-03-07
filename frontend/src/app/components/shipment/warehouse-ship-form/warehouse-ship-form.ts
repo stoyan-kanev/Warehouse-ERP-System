@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgForOf, NgIf } from '@angular/common';
+
 import { StockLevel } from '../../warehouse/warehouse.types';
-import {NgForOf, NgIf} from '@angular/common';
 
 type ShipProductVM = {
-    sku: string; // UNIQUE KEY
+    sku: string;
     name: string;
     unit: string;
     stockQty: number;
@@ -18,10 +19,11 @@ type ShipProductVM = {
 type ShipItemVM = ShipProductVM & { qty: number };
 
 export type ShipmentPayload = {
+    from_warehouse: number | null;
     destination_type: 'warehouse' | 'client';
     to_warehouse_id: number | null;
     client_address: string | null;
-    items: Array<{ sku: string; qty: number }>;
+    items: Array<{ sku: string; qty: number; unit: string }>;
 };
 
 @Component({
@@ -32,42 +34,37 @@ export type ShipmentPayload = {
 })
 export class WarehouseShipForm implements OnChanges {
     @Input() stocks: StockLevel[] | undefined;
-
-    // Optional: pass available warehouses from parent (for "To warehouse" selection)
-    @Input() warehouses: Array<{ id: number; name: string ,location:string}> = [];
+    @Input() selectedWarehouseId: number | null = null;
+    @Input() warehouses: Array<{ id: number; name: string; location: string }> = [];
 
     @Output() close = new EventEmitter<void>();
     @Output() submitShipment = new EventEmitter<ShipmentPayload>();
 
-    // Destination
     destinationType: 'warehouse' | 'client' = 'warehouse';
     toWarehouseId: number | null = null;
     clientAddress = '';
 
-    // Product search dropdown
     productSearch = '';
     dropdownOpen = false;
     activeIndex = 0;
 
     products: ShipProductVM[] = [];
     filteredProducts: ShipProductVM[] = [];
-
-    // Items
     items: ShipItemVM[] = [];
 
     ngOnChanges(): void {
         this.rebuildProductsFromStocks();
         this.applyFilter();
+        this.cleanupInvalidItems();
     }
 
-    onClose() {
+    onClose(): void {
         this.close.emit();
     }
 
-    setDestination(type: 'warehouse' | 'client') {
+    setDestination(type: 'warehouse' | 'client'): void {
         this.destinationType = type;
 
-        // reset irrelevant field
         if (type === 'warehouse') {
             this.clientAddress = '';
         } else {
@@ -75,86 +72,102 @@ export class WarehouseShipForm implements OnChanges {
         }
     }
 
-    /** Build unique products list from stocks using SKU as the key */
-    private rebuildProductsFromStocks() {
+    private rebuildProductsFromStocks(): void {
         const src = this.stocks ?? [];
-
-        // Merge by SKU (in case duplicates exist)
         const map = new Map<string, ShipProductVM>();
 
         for (const s of src) {
             const sku = (s.product_sku ?? '').trim();
             if (!sku) continue;
 
-            const stockQty = Number(s.quantity) || 0;
-            const minStock = Number(s.min_stock_level) || 0;
+            const stockQty = this.toSafeNumber(s.quantity);
+            const minStock = this.toSafeNumber(s.min_stock_level);
 
             const vm: ShipProductVM = {
                 sku,
-                name: s.product_name ?? '',
-                unit: s.product_unit ?? '',
+                name: (s.product_name ?? '').trim(),
+                unit: (s.product_unit ?? '').trim(),
                 stockQty,
                 minStockLevel: minStock,
-                priceSell: Number(s.price_sell) || 0,
-                priceBuy: Number(s.price_buy) || 0,
+                priceSell: this.toSafeNumber(s.price_sell),
+                priceBuy: this.toSafeNumber(s.price_buy),
                 warehouseId: Number(s.warehouse) || 0,
-                warehouseName: s.warehouse_name ?? '',
+                warehouseName: (s.warehouse_name ?? '').trim(),
             };
 
             const existing = map.get(sku);
             if (!existing) {
                 map.set(sku, vm);
             } else {
-                // Sum quantity if same SKU appears multiple times
-                map.set(sku, { ...existing, stockQty: existing.stockQty + stockQty });
+                map.set(sku, {
+                    ...existing,
+                    stockQty: existing.stockQty + stockQty,
+                });
             }
         }
 
         this.products = Array.from(map.values());
-
-        // Debug: uncomment if needed
-        // console.log('STOCKS:', src.length, 'PRODUCTS:', this.products.length, this.products.map(p => p.sku));
     }
 
-    openDropdown() {
+    private cleanupInvalidItems(): void {
+        if (this.items.length === 0) return;
+
+        const productMap = new Map(this.products.map(p => [p.sku, p]));
+        const nextItems: ShipItemVM[] = [];
+
+        for (const item of this.items) {
+            const latest = productMap.get(item.sku);
+            if (!latest) continue;
+            if (latest.stockQty <= 0) continue;
+
+            nextItems.push({
+                ...latest,
+                qty: this.clampQty(item.qty, latest.stockQty),
+            });
+        }
+
+        this.items = nextItems;
+    }
+
+    openDropdown(): void {
         this.dropdownOpen = true;
         this.activeIndex = 0;
         this.applyFilter();
     }
 
-    closeDropdown() {
+    closeDropdown(): void {
         this.dropdownOpen = false;
         this.activeIndex = 0;
     }
 
-    onComboBlur(ev: FocusEvent) {
+    onComboBlur(ev: FocusEvent): void {
         const related = ev.relatedTarget as HTMLElement | null;
         if (related && related.closest('.dropdown')) return;
         this.closeDropdown();
     }
 
-    onSearchChange() {
-        if (!this.dropdownOpen) this.openDropdown();
+    onSearchChange(): void {
+        if (!this.dropdownOpen) {
+            this.openDropdown();
+        }
         this.applyFilter();
     }
 
-    private applyFilter() {
-        const s = this.productSearch.trim().toLowerCase();
-        const base = this.products;
+    private applyFilter(): void {
+        const search = this.productSearch.trim().toLowerCase();
 
-        const filtered = !s
-            ? base
-            : base.filter(p =>
-                p.sku.toLowerCase().includes(s) ||
-                p.name.toLowerCase().includes(s)
+        const filtered = !search
+            ? this.products
+            : this.products.filter((p) =>
+                p.sku.toLowerCase().includes(search) ||
+                p.name.toLowerCase().includes(search)
             );
 
-        // Safety: don't render huge lists
         this.filteredProducts = filtered.slice(0, 80);
         this.activeIndex = 0;
     }
 
-    onSearchKeyDown(e: KeyboardEvent) {
+    onSearchKeyDown(e: KeyboardEvent): void {
         if (!this.dropdownOpen) return;
 
         if (e.key === 'ArrowDown') {
@@ -171,8 +184,10 @@ export class WarehouseShipForm implements OnChanges {
 
         if (e.key === 'Enter') {
             e.preventDefault();
-            const p = this.filteredProducts[this.activeIndex];
-            if (p) this.selectProduct(p);
+            const product = this.filteredProducts[this.activeIndex];
+            if (product) {
+                this.selectProduct(product);
+            }
             return;
         }
 
@@ -182,84 +197,122 @@ export class WarehouseShipForm implements OnChanges {
         }
     }
 
-    /** Add/merge item by SKU */
-    selectProduct(p: ShipProductVM) {
-        const idx = this.items.findIndex(x => x.sku === p.sku);
+    selectProduct(product: ShipProductVM): void {
+        if (product.stockQty <= 0) {
+            return;
+        }
+
+        const idx = this.items.findIndex((x) => x.sku === product.sku);
 
         if (idx !== -1) {
-            const it = this.items[idx];
-            it.qty = Math.min(it.qty + 1, it.stockQty || 999999);
+            const item = this.items[idx];
+            item.qty = this.clampQty(item.qty + 1, item.stockQty);
         } else {
-            // If stock is 0, still allow adding? Decide here:
-            // - If you want to block: if (p.stockQty <= 0) return;
-            this.items.push({ ...p, qty: Math.min(1, p.stockQty || 1) });
+            this.items.push({
+                ...product,
+                qty: this.clampQty(1, product.stockQty),
+            });
         }
 
         this.productSearch = '';
         this.applyFilter();
-
-        // keep dropdown open for rapid adding
-        // if you prefer close: this.closeDropdown();
     }
 
-    incQty(i: number) {
-        const it = this.items[i];
-        if (!it) return;
-        it.qty = Math.min(it.qty + 1, it.stockQty || 999999);
+    incQty(index: number): void {
+        const item = this.items[index];
+        if (!item) return;
+
+        item.qty = this.clampQty(item.qty + 1, item.stockQty);
     }
 
-    decQty(i: number) {
-        const it = this.items[i];
-        if (!it) return;
-        it.qty = Math.max(1, it.qty - 1);
+    decQty(index: number): void {
+        const item = this.items[index];
+        if (!item) return;
+
+        item.qty = this.clampQty(item.qty - 1, item.stockQty);
     }
 
-    setQty(i: number, raw: string) {
-        const it = this.items[i];
-        if (!it) return;
+    setQty(index: number, raw: string): void {
+        const item = this.items[index];
+        if (!item) return;
 
-        const n = Number(raw);
+        const normalized = raw.replace(',', '.').trim();
+        const parsed = Number(normalized);
 
-        if (!Number.isFinite(n)) return;
+        if (!Number.isFinite(parsed)) {
+            return;
+        }
 
-        const rounded = Math.round(n * 100) / 100;
-        const clamped = Math.max(0, rounded);
-
-        it.qty = Math.min(clamped, it.stockQty || 999999);
+        item.qty = this.clampQty(parsed, item.stockQty);
     }
 
-    removeItem(i: number) {
-        this.items.splice(i, 1);
+    removeItem(index: number): void {
+        this.items.splice(index, 1);
     }
 
     canSubmit(): boolean {
-        if (this.items.length === 0) return false;
+        if (this.selectedWarehouseId === null) {
+            return false;
+        }
+
+        if (this.items.length === 0) {
+            return false;
+        }
+
+        const hasInvalidItems = this.items.some((item) => {
+            return !item.sku.trim() || !item.unit.trim() || item.qty <= 0 || item.qty > item.stockQty;
+        });
+
+        if (hasInvalidItems) {
+            return false;
+        }
 
         if (this.destinationType === 'warehouse') {
-            return this.toWarehouseId !== null;
+            if (this.toWarehouseId === null) {
+                return false;
+            }
+
+            if (this.toWarehouseId === this.selectedWarehouseId) {
+                return false;
+            }
+
+            return true;
         }
 
         return this.clientAddress.trim().length >= 10;
     }
 
-    onSubmit() {
-        if (!this.canSubmit()) return;
+    onSubmit(): void {
+        if (!this.canSubmit()) {
+            return;
+        }
 
         const payload: ShipmentPayload = {
+            from_warehouse: this.selectedWarehouseId,
             destination_type: this.destinationType,
             to_warehouse_id: this.destinationType === 'warehouse' ? this.toWarehouseId : null,
             client_address: this.destinationType === 'client' ? this.clientAddress.trim() : null,
-            items: this.items.map(it => ({
-                sku: it.sku,
-                qty: it.qty,
+            items: this.items.map((item) => ({
+                sku: item.sku,
+                qty: Number(item.qty.toFixed(2)),
+                unit: item.unit,
             })),
         };
 
         this.submitShipment.emit(payload);
     }
 
-    /** Optional helpers for template */
-    isLowStock(p: ShipProductVM): boolean {
-        return p.stockQty < p.minStockLevel;
+    isLowStock(product: ShipProductVM): boolean {
+        return product.stockQty < product.minStockLevel;
+    }
+
+    private clampQty(value: number, maxStock: number): number {
+        const rounded = Math.round(value * 100) / 100;
+        return Math.max(0.01, Math.min(rounded, maxStock));
+    }
+
+    private toSafeNumber(value: unknown): number {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : 0;
     }
 }

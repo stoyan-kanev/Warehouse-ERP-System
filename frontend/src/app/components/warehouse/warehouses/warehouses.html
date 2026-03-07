@@ -183,6 +183,7 @@
         <div class="modal-wrap" role="dialog" aria-modal="true">
             <app-warehouse-ship-form
                 [warehouses]="availableWarehouses"
+                [selectedWarehouseId]="selectedWarehouseId"
                 (submitShipment)="createShipment($event)"
                 [stocks]="stockLevels"
                 (close)='closeShipForm()'>

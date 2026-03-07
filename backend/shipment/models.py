@@ -127,6 +127,7 @@ class ShipmentItem(models.Model):
         related_name="items",
     )
 
+    # Identification of product will be based on scu here
     product = models.ForeignKey(
         Product,
         on_delete=models.PROTECT,
