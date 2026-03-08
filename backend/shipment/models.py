@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -134,7 +137,11 @@ class ShipmentItem(models.Model):
         related_name="shipment_items",
     )
 
-    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))]
+    )
     unit = models.CharField(max_length=10, choices=Unit.choices, default=Unit.PCS)
 
     class Meta:

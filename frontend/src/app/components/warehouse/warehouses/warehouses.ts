@@ -325,9 +325,16 @@ export class WarehousesComponent implements OnInit {
     }
 
     createShipment($event: ShipmentPayload) {
-        if ($event) {
-            this.shipmentServices.createShipment($event)
-        }
+
+            this.shipmentServices.createShipment($event).subscribe({
+                next: () => {
+
+                    this.closeShipForm();
+                },
+                error:(err) =>{
+                    console.log(err)
+                }
+            })
 
     }
 }
