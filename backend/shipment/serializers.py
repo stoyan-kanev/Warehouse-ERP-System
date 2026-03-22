@@ -2,8 +2,9 @@ from django.db import transaction
 from rest_framework import serializers
 
 from product.models import Product
-from shipment.models import Shipment, ShipmentItem, ShipmentType, Unit
-from warehouse.models import Warehouse
+from shipment.models import Shipment, ShipmentItem, ShipmentType, Unit, ShipmentStatus
+from shipment.services import reserve_shipment_stock, release_shipment_stock
+from warehouse.models import Warehouse, StockLevel
 
 
 class ShipmentItemWriteSerializer(serializers.Serializer):
@@ -85,6 +86,29 @@ class ShipmentWriteSerializer(serializers.Serializer):
                 "items": "Duplicate SKUs are not allowed in the same shipment."
             })
 
+        products_by_sku = Product.objects.in_bulk(skus, field_name="sku")
+
+        for item in items:
+            product = products_by_sku[item["sku"]]
+            try:
+                stock = StockLevel.objects.get(
+                    warehouse_id=from_warehouse,
+                    product_id=product.id,
+                )
+            except StockLevel.DoesNotExist:
+                raise serializers.ValidationError({
+                    "items": [f"No stock found for SKU '{item['sku']}' in selected warehouse."]
+                })
+
+            available_quantity = stock.quantity - stock.reserved_quantity
+            if available_quantity < item["qty"]:
+                raise serializers.ValidationError({
+                    "items": [
+                        f"Insufficient available stock for SKU '{item['sku']}'. "
+                        f"Available: {available_quantity}, requested: {item['qty']}."
+                    ]
+                })
+
         return attrs
 
     @transaction.atomic
@@ -103,6 +127,7 @@ class ShipmentWriteSerializer(serializers.Serializer):
 
         shipment = Shipment(
             shipment_type=shipment_type,
+            status=ShipmentStatus.DRAFT,
             from_warehouse_id=validated_data["from_warehouse"],
             to_warehouse_id=to_warehouse_id if destination_type == "warehouse" else None,
             destination_address=client_address if destination_type == "client" else None,
@@ -130,13 +155,70 @@ class ShipmentWriteSerializer(serializers.Serializer):
 
         ShipmentItem.objects.bulk_create(shipment_items)
 
+        reserve_shipment_stock(shipment)
+
         return shipment
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        if instance.status != ShipmentStatus.DRAFT:
+            raise serializers.ValidationError({
+                "status": "Only draft shipments can be edited."
+            })
+
+        items_data = validated_data.pop("items")
+
+        destination_type = validated_data.pop("destination_type")
+        to_warehouse_id = validated_data.pop("to_warehouse_id", None)
+        client_address = validated_data.pop("client_address", None)
+
+        release_shipment_stock(instance)
+
+        instance.shipment_type = (
+            ShipmentType.TRANSFER
+            if destination_type == "warehouse"
+            else ShipmentType.OUTBOUND
+        )
+        instance.from_warehouse_id = validated_data["from_warehouse"]
+        instance.to_warehouse_id = to_warehouse_id if destination_type == "warehouse" else None
+        instance.destination_address = client_address if destination_type == "client" else None
+        instance.notes = validated_data.get("notes", "")
+        instance.full_clean()
+        instance.save()
+
+        instance.items.all().delete()
+
+        skus = [item["sku"] for item in items_data]
+        products_by_sku = Product.objects.in_bulk(skus, field_name="sku")
+
+        shipment_items = []
+        for item_data in items_data:
+            product = products_by_sku[item_data["sku"]]
+
+            item = ShipmentItem(
+                shipment=instance,
+                product=product,
+                quantity=item_data["qty"],
+                unit=item_data["unit"],
+            )
+            item.full_clean()
+            shipment_items.append(item)
+
+        ShipmentItem.objects.bulk_create(shipment_items)
+
+        reserve_shipment_stock(instance)
+
+        return instance
+
+
+class ShipmentStatusActionSerializer(serializers.Serializer):
+    pass
 
 
 class WarehouseMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Warehouse
-        fields = ["id", "name","location"]
+        fields = ["id", "name", "location"]
 
 
 class ProductMiniSerializer(serializers.ModelSerializer):
