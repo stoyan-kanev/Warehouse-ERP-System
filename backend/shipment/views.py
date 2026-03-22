@@ -34,7 +34,7 @@ class ShipmentViewSet(
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
             return ShipmentReadSerializer
-        if self.action in ["dispatch", "receive", "cancel"]:
+        if self.action in ["mark_sent", "receive", "cancel"]:
             return ShipmentStatusActionSerializer
         return ShipmentWriteSerializer
 
@@ -66,8 +66,12 @@ class ShipmentViewSet(
         read_serializer = ShipmentReadSerializer(shipment, context={"request": request})
         return Response(read_serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["post"])
-    def dispatch(self, request, pk=None):
+    def partial_update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
+
+    @action(detail=True, methods=["post"], url_path="mark-sent")
+    def mark_sent(self, request, pk=None):
         shipment = self.get_object()
         dispatch_shipment(shipment)
         shipment.refresh_from_db()

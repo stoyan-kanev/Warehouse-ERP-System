@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {DatePipe, NgClass, NgFor, NgIf} from '@angular/common';
-import {PaginatedResponse, Shipment, WarehouseMini} from '../shipment.type';
-import {ShipmentService} from '../shipment.service';
+import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { PaginatedResponse, Shipment, WarehouseMini } from '../shipment.type';
+import { ShipmentService } from '../shipment.service';
 
 @Component({
     selector: 'app-shipment-list',
@@ -19,6 +19,8 @@ export class ShipmentListComponent implements OnInit {
     totalCount = 0;
     totalPages = 0;
 
+    errorMessage = '';
+
     constructor(private shipmentService: ShipmentService) {}
 
     ngOnInit(): void {
@@ -27,6 +29,7 @@ export class ShipmentListComponent implements OnInit {
 
     loadShipments(page: number = 1): void {
         this.loading = true;
+        this.errorMessage = '';
 
         this.shipmentService.getShipments(page, this.pageSize).subscribe({
             next: (res: PaginatedResponse<Shipment>) => {
@@ -38,6 +41,7 @@ export class ShipmentListComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error loading shipments:', err);
+                this.errorMessage = 'Failed to load shipments.';
                 this.loading = false;
             }
         });
@@ -55,6 +59,8 @@ export class ShipmentListComponent implements OnInit {
         }
     }
 
+    // ===== UI HELPERS =====
+
     getWarehouseName(warehouse: Shipment['from_warehouse'] | Shipment['to_warehouse']): string {
         if (!warehouse) return '-';
         if (typeof warehouse === 'number') return `#${warehouse}`;
@@ -62,73 +68,86 @@ export class ShipmentListComponent implements OnInit {
     }
 
     getWarehouseAdress(warehouse: WarehouseMini | null): string {
-        if(!warehouse) return '-'
+        if (!warehouse) return '-';
         return warehouse.location;
     }
 
     getStatusClass(status: string): string {
-        switch (status) {
-            case 'DRAFT':
-                return 'status-draft';
-            case 'SENT':
-                return 'status-sent';
-            case 'IN_TRANSIT':
-                return 'status-in-transit';
-            case 'RECEIVED':
-                return 'status-received';
-            case 'CANCELLED':
-                return 'status-cancelled';
-            default:
-                return '';
-        }
+        return `status-${status.toLowerCase()}`;
     }
 
     getTypeClass(type: string): string {
-        switch (type) {
-            case 'TRANSFER':
-                return 'type-transfer';
-            case 'OUTBOUND':
-                return 'type-outbound';
-            default:
-                return '';
-        }
+        return `type-${type.toLowerCase()}`;
     }
 
     formatShipmentStatus(status: string): string {
-        switch (status) {
-            case 'DRAFT':
-                return 'Draft';
-            case 'SENT':
-                return 'Sent';
-            case 'IN_TRANSIT':
-                return 'In transit';
-            case 'RECEIVED':
-                return 'Received';
-            case 'CANCELLED':
-                return 'Cancelled';
-            default:
-                return status;
-        }
+        return status.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
     }
 
     formatShipmentType(type: string): string {
-        switch (type) {
-            case 'TRANSFER':
-                return 'Transfer';
-            case 'OUTBOUND':
-                return 'Outbound';
-            default:
-                return type;
-        }
+        return type.charAt(0) + type.slice(1).toLowerCase();
     }
 
     getProductLabel(product: any): string {
         if (!product) return '-';
-
-        if (typeof product === 'number') {
-            return `Product #${product}`;
-        }
-
+        if (typeof product === 'number') return `Product #${product}`;
         return product.name || product.sku || `Product #${product.id}`;
+    }
+
+    // ===== ACTIONS =====
+
+    dispatchShipment(shipment: Shipment): void {
+        this.shipmentService.dispatchShipment(shipment.id).subscribe({
+            next: (updated) => this.replaceShipmentInList(updated),
+            error: (err) => this.handleError(err)
+        });
+    }
+
+    receiveShipment(shipment: Shipment): void {
+        this.shipmentService.receiveShipment(shipment.id).subscribe({
+            next: (updated) => this.replaceShipmentInList(updated),
+            error: (err) => this.handleError(err)
+        });
+    }
+
+    cancelShipment(shipment: Shipment): void {
+        this.shipmentService.cancelShipment(shipment.id).subscribe({
+            next: (updated) => this.replaceShipmentInList(updated),
+            error: (err) => this.handleError(err)
+        });
+    }
+
+    // placeholder за бъдещ edit modal
+    editShipment(shipment: Shipment): void {
+        console.log('Edit shipment', shipment);
+    }
+
+    replaceShipmentInList(updated: Shipment): void {
+        this.shipments = this.shipments.map(item =>
+            item.id === updated.id ? updated : item
+        );
+    }
+
+    handleError(err: any): void {
+        console.error(err);
+        this.errorMessage =
+            err?.error?.items?.[0] ||
+            err?.error?.status ||
+            'Operation failed.';
+    }
+    canEdit(shipment: Shipment): boolean {
+        return shipment.status === 'DRAFT';
+    }
+
+    canCancel(shipment: Shipment): boolean {
+        return shipment.status === 'DRAFT';
+    }
+
+    canDispatch(shipment: Shipment): boolean {
+        return shipment.status === 'DRAFT';
+    }
+
+    canReceive(shipment: Shipment): boolean {
+        return shipment.status === 'SENT' || shipment.status === 'IN_TRANSIT';
     }
 }

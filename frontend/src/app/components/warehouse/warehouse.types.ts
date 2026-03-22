@@ -11,6 +11,7 @@ export type StockLevel = {
     warehouse_name: string;
 
     quantity: string;
+    reserved_quantity: string;
     min_stock_level: string;
     updated_at: string;
 };

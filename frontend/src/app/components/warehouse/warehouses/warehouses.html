@@ -103,6 +103,9 @@
                                         <span class="qty" [class.qty-low]="sl.quantity <= sl.min_stock_level">
                                             Quantity: {{ sl.quantity }}
                                         </span>
+                                        <span class="qty">
+                                            Reserved Quantity: {{ sl.reserved_quantity }}
+                                        </span>
                                         <span>Min: {{ sl.min_stock_level }}</span>
                                         <span>Unit: {{ sl.product_unit }}</span>
                                     </div>

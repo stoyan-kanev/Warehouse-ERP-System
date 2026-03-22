@@ -1,32 +1,48 @@
 <div class="shipments-page">
+
     <div class="page-header">
         <div>
             <h2>Shipments</h2>
-            <p class="page-subtitle">Track and review warehouse transfers and outbound deliveries.</p>
+            <p class="page-subtitle">
+                Track and manage warehouse transfers and deliveries.
+            </p>
         </div>
     </div>
 
+    <!-- ERROR -->
+    <div *ngIf="errorMessage" class="error-box">
+        {{ errorMessage }}
+    </div>
+
+    <!-- LOADING -->
     <div *ngIf="loading" class="state-box loading-box">
         <div class="spinner"></div>
         <span>Loading shipments...</span>
     </div>
 
+    <!-- EMPTY -->
     <div *ngIf="!loading && shipments.length === 0" class="state-box empty-box">
         <h3>No shipments found</h3>
         <p>There are no shipments to display at the moment.</p>
     </div>
 
+    <!-- LIST -->
     <div *ngIf="!loading && shipments.length > 0" class="shipments-list">
+
         <div *ngFor="let shipment of shipments" class="shipment-card">
+
+            <!-- HEADER -->
             <div class="shipment-card-header">
+
                 <div>
                     <div class="shipment-id">Shipment #{{ shipment.id }}</div>
                     <div class="shipment-date">
-                        Created: {{ shipment.created_at | date:'dd.MM.yyyy HH:mm' }}
+                        {{ shipment.created_at | date:'dd.MM.yyyy HH:mm' }}
                     </div>
                 </div>
 
                 <div class="shipment-header-right">
+
           <span class="shipment-type" [ngClass]="getTypeClass(shipment.shipment_type)">
             {{ formatShipmentType(shipment.shipment_type) }}
           </span>
@@ -34,44 +50,61 @@
                     <span class="shipment-status" [ngClass]="getStatusClass(shipment.status)">
             {{ formatShipmentStatus(shipment.status) }}
           </span>
+
                 </div>
+
             </div>
 
+            <!-- BODY -->
             <div class="shipment-card-body">
+
                 <div class="shipment-info-grid">
+
                     <div class="info-box">
-                        <span class="label">From warehouse</span>
-                        <span class="value">{{ getWarehouseName(shipment.from_warehouse) }} - {{getWarehouseAdress(shipment.from_warehouse)}}</span>
+                        <span class="label">From</span>
+                        <span class="value">
+              {{ getWarehouseName(shipment.from_warehouse) }}
+            </span>
                     </div>
 
                     <div class="info-box">
-                        <span class="label">To warehouse</span>
-                        <span class="value">{{ getWarehouseName(shipment.to_warehouse) }} - {{getWarehouseAdress(shipment.to_warehouse)}}</span>
+                        <span class="label">To</span>
+                        <span class="value">
+              {{ getWarehouseName(shipment.to_warehouse) }}
+            </span>
                     </div>
 
                     <div class="info-box">
-                        <span class="label">Destination address</span>
-                        <span class="value">{{ shipment.destination_address || '—' }}</span>
+                        <span class="label">Destination</span>
+                        <span class="value">
+              {{ shipment.destination_address || '—' }}
+            </span>
                     </div>
 
                     <div class="info-box">
-                        <span class="label">Items count</span>
-                        <span class="value">{{ shipment.items?.length || 0 }}</span>
+                        <span class="label">Items</span>
+                        <span class="value">
+              {{ shipment.items?.length || 0 }}
+            </span>
                     </div>
+
                 </div>
 
-                <div class="shipment-notes" *ngIf="shipment.notes">
-                    <span class="label">Notes</span>
-                    <p>{{ shipment.notes }}</p>
+                <!-- DRAFT INFO -->
+                <div *ngIf="shipment.status === 'DRAFT'" class="shipment-note">
+                    Stock reserved
                 </div>
 
+                <!-- ITEMS -->
                 <div *ngIf="shipment.items?.length" class="shipment-items">
+
                     <div class="section-title">Items</div>
 
                     <div class="items-table">
+
                         <div class="items-head">
                             <span>Product</span>
-                            <span>Quantity</span>
+                            <span>Qty</span>
                             <span>Unit</span>
                         </div>
 
@@ -80,13 +113,56 @@
                             <span>{{ item.quantity }}</span>
                             <span>{{ item.unit }}</span>
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+            <!-- ACTIONS -->
+            <div class="shipment-actions">
+                <button
+                    *ngIf="canEdit(shipment)"
+                    class="btn ghost"
+                    type="button"
+                    (click)="editShipment(shipment)">
+                    Edit
+                </button>
+
+                <button
+                    *ngIf="canCancel(shipment)"
+                    class="btn danger"
+                    type="button"
+                    (click)="cancelShipment(shipment)">
+                    Cancel
+                </button>
+
+                <button
+                    *ngIf="canDispatch(shipment)"
+                    class="btn primary"g
+                    type="button"
+                    (click)="dispatchShipment(shipment)">
+                    Dispatch
+                </button>
+
+                <button
+                    *ngIf="canReceive(shipment)"
+                    class="btn primary"
+                    type="button"
+                    (click)="receiveShipment(shipment)">
+                    Mark received
+                </button>
+            </div>
+
         </div>
 
+        <!-- PAGINATION -->
         <div class="pagination" *ngIf="totalPages > 1">
-            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+
+            <button class="page-btn"
+                    (click)="prevPage()"
+                    [disabled]="currentPage === 1">
                 Previous
             </button>
 
@@ -94,9 +170,14 @@
                 Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
             </div>
 
-            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <button class="page-btn"
+                    (click)="nextPage()"
+                    [disabled]="currentPage === totalPages">
                 Next
             </button>
+
         </div>
+
     </div>
+
 </div>

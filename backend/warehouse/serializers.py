@@ -29,6 +29,7 @@ class StockLevelSerializer(serializers.ModelSerializer):
             "id",
             "warehouse",
             "quantity",
+            "reserved_quantity",
             "min_stock_level",
             "updated_at",
 
