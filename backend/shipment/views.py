@@ -1,6 +1,7 @@
 from rest_framework import permissions, mixins, viewsets, status
 from rest_framework.response import Response
 
+from product.pagination import DefaultPagination
 from shipment.models import Shipment
 from shipment.serializers import ShipmentWriteSerializer, ShipmentReadSerializer
 
@@ -11,13 +12,13 @@ class ShipmentViewSet(
     viewsets.GenericViewSet
 ):
     permission_classes = [permissions.IsAuthenticated]
-
+    pagination_class = DefaultPagination
     def get_queryset(self):
         return (
             Shipment.objects
             .select_related("from_warehouse", "to_warehouse", "created_by")
             .prefetch_related("items__product")
-            .all()
+            .order_by("-id")
         )
 
     def get_serializer_class(self):
@@ -32,3 +33,5 @@ class ShipmentViewSet(
 
         read_serializer = ShipmentReadSerializer(shipment, context={"request": request})
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+
+

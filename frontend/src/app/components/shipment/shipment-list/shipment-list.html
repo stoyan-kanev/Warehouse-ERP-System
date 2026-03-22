@@ -1,0 +1,102 @@
+<div class="shipments-page">
+    <div class="page-header">
+        <div>
+            <h2>Shipments</h2>
+            <p class="page-subtitle">Track and review warehouse transfers and outbound deliveries.</p>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="state-box loading-box">
+        <div class="spinner"></div>
+        <span>Loading shipments...</span>
+    </div>
+
+    <div *ngIf="!loading && shipments.length === 0" class="state-box empty-box">
+        <h3>No shipments found</h3>
+        <p>There are no shipments to display at the moment.</p>
+    </div>
+
+    <div *ngIf="!loading && shipments.length > 0" class="shipments-list">
+        <div *ngFor="let shipment of shipments" class="shipment-card">
+            <div class="shipment-card-header">
+                <div>
+                    <div class="shipment-id">Shipment #{{ shipment.id }}</div>
+                    <div class="shipment-date">
+                        Created: {{ shipment.created_at | date:'dd.MM.yyyy HH:mm' }}
+                    </div>
+                </div>
+
+                <div class="shipment-header-right">
+          <span class="shipment-type" [ngClass]="getTypeClass(shipment.shipment_type)">
+            {{ formatShipmentType(shipment.shipment_type) }}
+          </span>
+
+                    <span class="shipment-status" [ngClass]="getStatusClass(shipment.status)">
+            {{ formatShipmentStatus(shipment.status) }}
+          </span>
+                </div>
+            </div>
+
+            <div class="shipment-card-body">
+                <div class="shipment-info-grid">
+                    <div class="info-box">
+                        <span class="label">From warehouse</span>
+                        <span class="value">{{ getWarehouseName(shipment.from_warehouse) }} - {{getWarehouseAdress(shipment.from_warehouse)}}</span>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="label">To warehouse</span>
+                        <span class="value">{{ getWarehouseName(shipment.to_warehouse) }} - {{getWarehouseAdress(shipment.to_warehouse)}}</span>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="label">Destination address</span>
+                        <span class="value">{{ shipment.destination_address || '—' }}</span>
+                    </div>
+
+                    <div class="info-box">
+                        <span class="label">Items count</span>
+                        <span class="value">{{ shipment.items?.length || 0 }}</span>
+                    </div>
+                </div>
+
+                <div class="shipment-notes" *ngIf="shipment.notes">
+                    <span class="label">Notes</span>
+                    <p>{{ shipment.notes }}</p>
+                </div>
+
+                <div *ngIf="shipment.items?.length" class="shipment-items">
+                    <div class="section-title">Items</div>
+
+                    <div class="items-table">
+                        <div class="items-head">
+                            <span>Product</span>
+                            <span>Quantity</span>
+                            <span>Unit</span>
+                        </div>
+
+                        <div class="items-row" *ngFor="let item of shipment.items">
+                            <span>{{ getProductLabel(item.product) }}</span>
+                            <span>{{ item.quantity }}</span>
+                            <span>{{ item.unit }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination" *ngIf="totalPages > 1">
+            <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+                Previous
+            </button>
+
+            <div class="page-indicator">
+                Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
+            </div>
+
+            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                Next
+            </button>
+        </div>
+    </div>
+</div>

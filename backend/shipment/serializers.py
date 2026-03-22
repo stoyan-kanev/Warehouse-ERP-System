@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from product.models import Product
-from shipment.models import Shipment, ShipmentItem, ShipmentType
+from shipment.models import Shipment, ShipmentItem, ShipmentType, Unit
 from warehouse.models import Warehouse
 
 
@@ -23,7 +23,7 @@ class ShipmentItemWriteSerializer(serializers.Serializer):
 
     def validate_unit(self, value):
         value = value.upper()
-        valid_units = {"PCS", "KG", "L"}
+        valid_units = {choice[0] for choice in Unit.choices}
         if value not in valid_units:
             raise serializers.ValidationError("Invalid unit.")
         return value
@@ -133,42 +133,60 @@ class ShipmentWriteSerializer(serializers.Serializer):
         return shipment
 
 
+class WarehouseMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Warehouse
+        fields = ["id", "name","location"]
+
+
+class ProductMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id", "name", "sku"]
+
+
+class UserMiniSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(read_only=True)
+
+
 class ShipmentItemReadSerializer(serializers.ModelSerializer):
-    product_name = serializers.CharField(source="product.name", read_only=True)
-    product_sku = serializers.CharField(source="product.sku", read_only=True)
+    product = ProductMiniSerializer(read_only=True)
+    unit_label = serializers.CharField(source="get_unit_display", read_only=True)
 
     class Meta:
         model = ShipmentItem
         fields = [
             "id",
             "product",
-            "product_name",
-            "product_sku",
             "quantity",
             "unit",
+            "unit_label",
         ]
 
 
 class ShipmentReadSerializer(serializers.ModelSerializer):
+    from_warehouse = WarehouseMiniSerializer(read_only=True)
+    to_warehouse = WarehouseMiniSerializer(read_only=True)
+    created_by = UserMiniSerializer(read_only=True)
     items = ShipmentItemReadSerializer(many=True, read_only=True)
-    from_warehouse_name = serializers.CharField(source="from_warehouse.name", read_only=True)
-    to_warehouse_name = serializers.CharField(source="to_warehouse.name", read_only=True)
-    created_by_username = serializers.CharField(source="created_by.username", read_only=True)
+
+    shipment_type_label = serializers.CharField(source="get_shipment_type_display", read_only=True)
+    status_label = serializers.CharField(source="get_status_display", read_only=True)
 
     class Meta:
         model = Shipment
         fields = [
             "id",
             "shipment_type",
+            "shipment_type_label",
             "status",
+            "status_label",
             "from_warehouse",
-            "from_warehouse_name",
             "to_warehouse",
-            "to_warehouse_name",
             "destination_address",
             "notes",
             "created_by",
-            "created_by_username",
             "dispatched_at",
             "received_at",
             "created_at",
