@@ -187,7 +187,7 @@
             <app-warehouse-ship-form
                 [warehouses]="availableWarehouses"
                 [selectedWarehouseId]="selectedWarehouseId"
-                (submitShipment)="createShipment($event)"
+                (submitShipment)="saveShipment($event)"
                 [stocks]="stockLevels"
                 (close)='closeShipForm()'>
             </app-warehouse-ship-form>

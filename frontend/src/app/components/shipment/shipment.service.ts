@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
-import {PaginatedResponse, Shipment} from './shipment.type';
+import {PaginatedResponse, Shipment, ShipmentPayload} from './shipment.type';
 import {Observable} from 'rxjs';
-import {ShipmentPayload} from './warehouse-ship-form/warehouse-ship-form';
 
 @Injectable({
     providedIn: 'root'

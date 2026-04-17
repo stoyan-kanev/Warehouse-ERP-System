@@ -1,18 +1,20 @@
-import {Component, OnInit} from '@angular/core';
-import {MatButton} from '@angular/material/button';
-import {WarehouseCreation} from '../warehouse-creation/warehouse-creation';
-import {Warehouse, WarehouseCreatePayload, WarehousesService} from '../warehouses.services';
-import {StockLevel, StockLevelCreatePayload} from '../warehouse.types';
-import {StockLevelsService} from '../stockLevel.service';
-import {FormsModule} from '@angular/forms';
-import {WarehouseAddProductDialog} from '../warehouse-add-product-dialog/warehouse-add-product-dialog';
-import {DecimalPipe} from '@angular/common';
-import {WarehouseDetailProductDialog} from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
-import {Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
-import {ShipmentPayload, WarehouseShipForm} from '../../shipment/warehouse-ship-form/warehouse-ship-form';
-import {ShipmentService} from '../../shipment/shipment.service';
+import { Component, OnInit } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
+import { WarehouseCreation } from '../warehouse-creation/warehouse-creation';
+import { Warehouse, WarehouseCreatePayload, WarehousesService } from '../warehouses.services';
+import { StockLevel, StockLevelCreatePayload } from '../warehouse.types';
+import { StockLevelsService } from '../stockLevel.service';
+import { WarehouseAddProductDialog } from '../warehouse-add-product-dialog/warehouse-add-product-dialog';
+import { WarehouseDetailProductDialog } from '../warehouse-detail-product-dialog/warehouse-detail-product-dialog';
+
+import { WarehouseShipForm } from '../../shipment/warehouse-ship-form/warehouse-ship-form';
+import { ShipmentService } from '../../shipment/shipment.service';
+import { Shipment, ShipmentPayload } from '../../shipment/shipment.type';
 
 @Component({
     selector: 'app-warehouses',
@@ -22,10 +24,8 @@ import {ShipmentService} from '../../shipment/shipment.service';
         FormsModule,
         DecimalPipe,
         WarehouseAddProductDialog,
-        DecimalPipe,
         WarehouseDetailProductDialog,
         WarehouseShipForm,
-
     ],
     standalone: true,
     templateUrl: './warehouses.html',
@@ -35,10 +35,11 @@ export class WarehousesComponent implements OnInit {
     warehouses: Warehouse[] = [];
     selectedWarehouseId: number | null = null;
     availableWarehouses: Warehouse[] = [];
+
     skuQuery = '';
     private sku$ = new Subject<string>();
-    private stockLevelsAll: StockLevel[] = [];
 
+    private stockLevelsAll: StockLevel[] = [];
     stockLevels: StockLevel[] = [];
     isStockLoading = false;
 
@@ -57,28 +58,27 @@ export class WarehousesComponent implements OnInit {
     warehouseError: string | null = null;
 
     isShipmentOpen = false;
-
+    shipmentEditMode = false;
+    editingShipment: Shipment | null = null;
 
     errMessage = '';
-
 
     constructor(
         private warehousesService: WarehousesService,
         private stockLevelsService: StockLevelsService,
-        private shipmentServices:ShipmentService
-    ){}
+        private shipmentServices: ShipmentService
+    ) {}
 
     ngOnInit(): void {
         this.loadWarehouses();
+
         this.sku$
             .pipe(debounceTime(200), distinctUntilChanged())
             .subscribe((q) => {
                 this.skuQuery = q;
                 this.filterStockLevelsBySku();
             });
-
     }
-
 
     loadWarehouses(selectFirst = true): void {
         this.warehousesService.list(false).subscribe({
@@ -88,9 +88,9 @@ export class WarehousesComponent implements OnInit {
                 if (selectFirst && this.selectedWarehouseId == null && this.warehouses.length) {
                     this.selectedWarehouseId = this.warehouses[0].id;
                     this.onWarehouseChange(this.selectedWarehouseId);
-                    this.availableWarehouses = this.warehouses.filter(w=> w.id != this.selectedWarehouseId);
-
                 }
+
+                this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
             },
             error: (err) => console.error('Failed to load warehouses', err),
         });
@@ -103,10 +103,10 @@ export class WarehousesComponent implements OnInit {
         if (this.selectedWarehouseId) {
             this.clearSkuSearch();
             this.loadStockLevels(this.selectedWarehouseId);
-            this.availableWarehouses = this.warehouses.filter(w=> w.id != this.selectedWarehouseId);
-
+            this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
         } else {
             this.stockLevels = [];
+            this.availableWarehouses = [];
         }
     }
 
@@ -214,18 +214,13 @@ export class WarehousesComponent implements OnInit {
         this.warehousesService.update(this.editingWarehouse.id, payload).subscribe({
             next: (updated) => {
                 this.isEditSaving = false;
-
-                // update local list
                 this.warehouses = this.warehouses.map(w => w.id === updated.id ? updated : w);
-
-                // keep selected
                 this.selectedWarehouseId = updated.id;
-
+                this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
                 this.closeEditWarehouse();
             },
             error: (err) => {
                 this.isEditSaving = false;
-                // normalize error to string
                 const raw = err?.error?.name?.[0] || err?.error?.location?.[0] || err?.error?.detail || err?.error?.error;
                 this.warehouseError = Array.isArray(raw) ? raw[0] : (raw || 'Update failed.');
             },
@@ -242,17 +237,16 @@ export class WarehousesComponent implements OnInit {
 
         this.warehousesService.deactivate(this.selectedWarehouseId).subscribe({
             next: () => {
-                // remove from list locally
                 this.warehouses = this.warehouses.filter(x => x.id !== this.selectedWarehouseId);
-
-                // reset selection
                 this.selectedWarehouseId = this.warehouses.length ? this.warehouses[0].id : null;
 
-                // reload stock
-                if (this.selectedWarehouseId) this.loadStockLevels(this.selectedWarehouseId);
-                else this.stockLevels = [];
+                if (this.selectedWarehouseId) {
+                    this.loadStockLevels(this.selectedWarehouseId);
+                } else {
+                    this.stockLevels = [];
+                }
 
-                // optional: if edit modal open
+                this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
                 this.closeEditWarehouse();
             },
             error: (err) => console.error('Failed to deactivate warehouse', err),
@@ -305,6 +299,7 @@ export class WarehousesComponent implements OnInit {
 
                 this.warehouses = [created, ...this.warehouses];
                 this.selectedWarehouseId = created.id;
+                this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
                 this.clearSkuSearch();
                 this.loadStockLevels(created.id);
             },
@@ -315,26 +310,61 @@ export class WarehousesComponent implements OnInit {
         });
     }
 
+    // ===== SHIPMENTS =====
 
-    openCreateShipment() {
+    openCreateShipment(): void {
+        if (!this.selectedWarehouseId) return;
+
+        this.shipmentEditMode = false;
+        this.editingShipment = null;
         this.isShipmentOpen = true;
     }
 
-    closeShipForm(){
-        this.isShipmentOpen = false;
+    openEditShipment(shipment: Shipment): void {
+        this.shipmentEditMode = true;
+        this.editingShipment = shipment;
+        this.selectedWarehouseId = shipment.from_warehouse.id;
+        this.availableWarehouses = this.warehouses.filter(w => w.id !== this.selectedWarehouseId);
+
+        if (this.selectedWarehouseId) {
+            this.loadStockLevels(this.selectedWarehouseId);
+        }
+
+        this.isShipmentOpen = true;
     }
 
-    createShipment($event: ShipmentPayload) {
+    closeShipForm(): void {
+        this.isShipmentOpen = false;
+        this.shipmentEditMode = false;
+        this.editingShipment = null;
+    }
 
-            this.shipmentServices.createShipment($event).subscribe({
+    saveShipment(payload: ShipmentPayload): void {
+        if (this.shipmentEditMode && this.editingShipment) {
+            this.shipmentServices.updateShipment(this.editingShipment.id, payload).subscribe({
                 next: () => {
-
                     this.closeShipForm();
+                    if (this.selectedWarehouseId) {
+                        this.loadStockLevels(this.selectedWarehouseId);
+                    }
                 },
-                error:(err) =>{
-                    console.log(err)
+                error: (err) => {
+                    console.error(err);
                 }
-            })
+            });
+            return;
+        }
 
+        this.shipmentServices.createShipment(payload).subscribe({
+            next: () => {
+                this.closeShipForm();
+                if (this.selectedWarehouseId) {
+                    this.loadStockLevels(this.selectedWarehouseId);
+                }
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
     }
 }

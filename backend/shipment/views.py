@@ -1,3 +1,4 @@
+from django.db.models import When, Case, Value, IntegerField
 from rest_framework import permissions, mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -28,7 +29,18 @@ class ShipmentViewSet(
             Shipment.objects
             .select_related("from_warehouse", "to_warehouse", "created_by")
             .prefetch_related("items__product")
-            .order_by("-id")
+            .annotate(
+                status_order=Case(
+                    When(status='DRAFT', then=Value(0)),
+                    When(status='SENT', then=Value(1)),
+                    When(status='IN_TRANSIT', then=Value(2)),
+                    When(status='RECEIVED', then=Value(3)),
+                    When(status='CANCELLED', then=Value(4)),
+                    default=Value(99),
+                    output_field=IntegerField()
+                )
+            )
+            .order_by('status_order', '-created_at')
         )
 
     def get_serializer_class(self):

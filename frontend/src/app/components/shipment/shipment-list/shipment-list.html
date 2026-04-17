@@ -1,3 +1,18 @@
+<div class="modal-backdrop" *ngIf="isEditOpen && selectedShipment" (click)="onCloseEdit()"></div>
+
+<div class="modal-wrap" *ngIf="isEditOpen && selectedShipment">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+        <app-warehouse-ship-form
+            [editMode]="true"
+            [initialData]="selectedShipment"
+            [stocks]="editStocks"
+            [selectedWarehouseId]="selectedShipment.from_warehouse.id"
+            [warehouses]="editWarehouses"
+            (close)="onCloseEdit()"
+            (submitShipment)="onUpdateShipment($event)">
+        </app-warehouse-ship-form>
+    </div>
+</div>
 <div class="shipments-page">
 
     <div class="page-header">
@@ -9,31 +24,25 @@
         </div>
     </div>
 
-    <!-- ERROR -->
     <div *ngIf="errorMessage" class="error-box">
         {{ errorMessage }}
     </div>
 
-    <!-- LOADING -->
     <div *ngIf="loading" class="state-box loading-box">
         <div class="spinner"></div>
         <span>Loading shipments...</span>
     </div>
 
-    <!-- EMPTY -->
     <div *ngIf="!loading && shipments.length === 0" class="state-box empty-box">
         <h3>No shipments found</h3>
         <p>There are no shipments to display at the moment.</p>
     </div>
 
-    <!-- LIST -->
     <div *ngIf="!loading && shipments.length > 0" class="shipments-list">
 
         <div *ngFor="let shipment of shipments" class="shipment-card">
 
-            <!-- HEADER -->
             <div class="shipment-card-header">
-
                 <div>
                     <div class="shipment-id">Shipment #{{ shipment.id }}</div>
                     <div class="shipment-date">
@@ -42,66 +51,55 @@
                 </div>
 
                 <div class="shipment-header-right">
-
-          <span class="shipment-type" [ngClass]="getTypeClass(shipment.shipment_type)">
-            {{ formatShipmentType(shipment.shipment_type) }}
-          </span>
+                    <span class="shipment-type" [ngClass]="getTypeClass(shipment.shipment_type)">
+                        {{ formatShipmentType(shipment.shipment_type) }}
+                    </span>
 
                     <span class="shipment-status" [ngClass]="getStatusClass(shipment.status)">
-            {{ formatShipmentStatus(shipment.status) }}
-          </span>
-
+                        {{ formatShipmentStatus(shipment.status) }}
+                    </span>
                 </div>
-
             </div>
 
-            <!-- BODY -->
             <div class="shipment-card-body">
-
                 <div class="shipment-info-grid">
-
                     <div class="info-box">
                         <span class="label">From</span>
                         <span class="value">
-              {{ getWarehouseName(shipment.from_warehouse) }}
-            </span>
+                            {{ getWarehouseName(shipment.from_warehouse) }} -- {{getWarehouseAdress(shipment.from_warehouse)}}
+                        </span>
                     </div>
 
                     <div class="info-box">
                         <span class="label">To</span>
                         <span class="value">
-              {{ getWarehouseName(shipment.to_warehouse) }}
-            </span>
+                            {{ getWarehouseName(shipment.to_warehouse) }} -- {{getWarehouseAdress(shipment.to_warehouse)}}
+                        </span>
                     </div>
 
                     <div class="info-box">
                         <span class="label">Destination</span>
                         <span class="value">
-              {{ shipment.destination_address || '—' }}
-            </span>
+                            {{ shipment.destination_address || '—' }}
+                        </span>
                     </div>
 
                     <div class="info-box">
                         <span class="label">Items</span>
                         <span class="value">
-              {{ shipment.items?.length || 0 }}
-            </span>
+                            {{ shipment.items.length || 0 }}
+                        </span>
                     </div>
-
                 </div>
 
-                <!-- DRAFT INFO -->
                 <div *ngIf="shipment.status === 'DRAFT'" class="shipment-note">
                     Stock reserved
                 </div>
 
-                <!-- ITEMS -->
-                <div *ngIf="shipment.items?.length" class="shipment-items">
-
+                <div *ngIf="shipment.items.length" class="shipment-items">
                     <div class="section-title">Items</div>
 
                     <div class="items-table">
-
                         <div class="items-head">
                             <span>Product</span>
                             <span>Qty</span>
@@ -113,14 +111,10 @@
                             <span>{{ item.quantity }}</span>
                             <span>{{ item.unit }}</span>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- ACTIONS -->
             <div class="shipment-actions">
                 <button
                     *ngIf="canEdit(shipment)"
@@ -140,7 +134,7 @@
 
                 <button
                     *ngIf="canDispatch(shipment)"
-                    class="btn primary"g
+                    class="btn primary"
                     type="button"
                     (click)="dispatchShipment(shipment)">
                     Dispatch
@@ -157,9 +151,7 @@
 
         </div>
 
-        <!-- PAGINATION -->
         <div class="pagination" *ngIf="totalPages > 1">
-
             <button class="page-btn"
                     (click)="prevPage()"
                     [disabled]="currentPage === 1">
@@ -175,7 +167,6 @@
                     [disabled]="currentPage === totalPages">
                 Next
             </button>
-
         </div>
 
     </div>

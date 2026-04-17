@@ -286,7 +286,6 @@
     gap: 10px;
     flex-wrap: wrap;
     padding: 0 20px 20px;
-    border-top: 1px solid #eef2f7;
     margin-top: 4px;
 }
 
@@ -329,6 +328,35 @@
 
 .btn.danger:hover {
     background: #fecaca;
+}
+.error-box{
+    color:red
+}
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 12, 20, 0.68);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+}
+
+.modal-wrap {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-panel {
+    width: min(980px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
 }
 @media (max-width: 992px) {
     .shipment-info-grid {

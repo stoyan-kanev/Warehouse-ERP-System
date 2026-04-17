@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgForOf, NgIf } from '@angular/common';
 
 import { StockLevel } from '../../warehouse/warehouse.types';
+import { Shipment, ShipmentPayload } from '../shipment.type';
 
 type ShipProductVM = {
     sku: string;
     name: string;
     unit: string;
-    stockQty: number;
+    stockQty: number; // max allowed in UI
     minStockLevel: number;
     priceSell: number;
     priceBuy: number;
@@ -17,14 +18,6 @@ type ShipProductVM = {
 };
 
 type ShipItemVM = ShipProductVM & { qty: number };
-
-export type ShipmentPayload = {
-    from_warehouse: number | null;
-    destination_type: 'warehouse' | 'client';
-    to_warehouse_id: number | null;
-    client_address: string | null;
-    items: Array<{ sku: string; qty: number; unit: string }>;
-};
 
 @Component({
     selector: 'app-warehouse-ship-form',
@@ -37,12 +30,16 @@ export class WarehouseShipForm implements OnChanges {
     @Input() selectedWarehouseId: number | null = null;
     @Input() warehouses: Array<{ id: number; name: string; location: string }> = [];
 
+    @Input() editMode = false;
+    @Input() initialData: Shipment | null = null;
+
     @Output() close = new EventEmitter<void>();
     @Output() submitShipment = new EventEmitter<ShipmentPayload>();
 
     destinationType: 'warehouse' | 'client' = 'warehouse';
     toWarehouseId: number | null = null;
     clientAddress = '';
+    notes = '';
 
     productSearch = '';
     dropdownOpen = false;
@@ -52,10 +49,19 @@ export class WarehouseShipForm implements OnChanges {
     filteredProducts: ShipProductVM[] = [];
     items: ShipItemVM[] = [];
 
-    ngOnChanges(): void {
+    ngOnChanges(changes: SimpleChanges): void {
         this.rebuildProductsFromStocks();
+
+        const initialDataChanged = !!changes['initialData'];
+        const stocksChanged = !!changes['stocks'];
+
+        if (this.editMode && this.initialData && (initialDataChanged || stocksChanged)) {
+            this.fillFromShipment(this.initialData);
+        } else if (!this.editMode && (changes['selectedWarehouseId'] || stocksChanged)) {
+            this.cleanupInvalidItems();
+        }
+
         this.applyFilter();
-        this.cleanupInvalidItems();
     }
 
     onClose(): void {
@@ -72,6 +78,35 @@ export class WarehouseShipForm implements OnChanges {
         }
     }
 
+    private fillFromShipment(shipment: Shipment): void {
+        this.selectedWarehouseId = shipment.from_warehouse.id;
+        this.destinationType = shipment.shipment_type === 'TRANSFER' ? 'warehouse' : 'client';
+        this.toWarehouseId = shipment.to_warehouse?.id ?? null;
+        this.clientAddress = shipment.destination_address ?? '';
+        this.notes = shipment.notes ?? '';
+
+        const productMap = new Map(this.products.map(p => [p.sku, p]));
+
+        this.items = shipment.items.map(item => {
+            const currentQty = this.toSafeNumber(item.quantity);
+            const currentProduct = productMap.get(item.product.sku);
+            const availableNow = currentProduct?.stockQty ?? 0;
+
+            return {
+                sku: item.product.sku,
+                name: item.product.name,
+                unit: item.unit,
+                stockQty: availableNow + currentQty,
+                minStockLevel: currentProduct?.minStockLevel ?? 0,
+                priceSell: currentProduct?.priceSell ?? 0,
+                priceBuy: currentProduct?.priceBuy ?? 0,
+                warehouseId: currentProduct?.warehouseId ?? shipment.from_warehouse.id,
+                warehouseName: currentProduct?.warehouseName ?? shipment.from_warehouse.name,
+                qty: currentQty,
+            };
+        });
+    }
+
     private rebuildProductsFromStocks(): void {
         const src = this.stocks ?? [];
         const map = new Map<string, ShipProductVM>();
@@ -80,7 +115,7 @@ export class WarehouseShipForm implements OnChanges {
             const sku = (s.product_sku ?? '').trim();
             if (!sku) continue;
 
-            const stockQty = this.toSafeNumber(s.quantity);
+            const stockQty = this.toSafeNumber((s as any).available_quantity ?? s.quantity);
             const minStock = this.toSafeNumber(s.min_stock_level);
 
             const vm: ShipProductVM = {
@@ -198,9 +233,7 @@ export class WarehouseShipForm implements OnChanges {
     }
 
     selectProduct(product: ShipProductVM): void {
-        if (product.stockQty <= 0) {
-            return;
-        }
+        if (product.stockQty <= 0) return;
 
         const idx = this.items.findIndex((x) => x.sku === product.sku);
 
@@ -221,14 +254,12 @@ export class WarehouseShipForm implements OnChanges {
     incQty(index: number): void {
         const item = this.items[index];
         if (!item) return;
-
         item.qty = this.clampQty(item.qty + 1, item.stockQty);
     }
 
     decQty(index: number): void {
         const item = this.items[index];
         if (!item) return;
-
         item.qty = this.clampQty(item.qty - 1, item.stockQty);
     }
 
@@ -237,11 +268,11 @@ export class WarehouseShipForm implements OnChanges {
         if (!item) return;
 
         const normalized = raw.replace(',', '.').trim();
-        const parsed = Number(normalized);
-
-        if (!Number.isFinite(parsed)) {
+        if (normalized === '' || normalized === '.' || normalized === '-')
             return;
-        }
+
+        const parsed = Number(normalized);
+        if (!Number.isFinite(parsed)) return;
 
         item.qty = this.clampQty(parsed, item.stockQty);
     }
@@ -251,47 +282,33 @@ export class WarehouseShipForm implements OnChanges {
     }
 
     canSubmit(): boolean {
-        if (this.selectedWarehouseId === null) {
-            return false;
-        }
-
-        if (this.items.length === 0) {
-            return false;
-        }
+        if (this.selectedWarehouseId === null) return false;
+        if (this.items.length === 0) return false;
 
         const hasInvalidItems = this.items.some((item) => {
             return !item.sku.trim() || !item.unit.trim() || item.qty <= 0 || item.qty > item.stockQty;
         });
 
-        if (hasInvalidItems) {
-            return false;
-        }
+        if (hasInvalidItems) return false;
 
         if (this.destinationType === 'warehouse') {
-            if (this.toWarehouseId === null) {
-                return false;
-            }
-
-            if (this.toWarehouseId === this.selectedWarehouseId) {
-                return false;
-            }
-
+            if (this.toWarehouseId === null) return false;
+            if (this.toWarehouseId === this.selectedWarehouseId) return false;
             return true;
         }
 
-        return this.clientAddress.trim().length >= 10;
+        return this.clientAddress.trim().length >= 3;
     }
 
     onSubmit(): void {
-        if (!this.canSubmit()) {
-            return;
-        }
+        if (!this.canSubmit() || this.selectedWarehouseId === null) return;
 
         const payload: ShipmentPayload = {
             from_warehouse: this.selectedWarehouseId,
             destination_type: this.destinationType,
             to_warehouse_id: this.destinationType === 'warehouse' ? this.toWarehouseId : null,
             client_address: this.destinationType === 'client' ? this.clientAddress.trim() : null,
+            notes: this.notes.trim(),
             items: this.items.map((item) => ({
                 sku: item.sku,
                 qty: Number(item.qty.toFixed(2)),

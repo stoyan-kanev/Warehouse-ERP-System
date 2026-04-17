@@ -88,8 +88,17 @@ class ShipmentWriteSerializer(serializers.Serializer):
 
         products_by_sku = Product.objects.in_bulk(skus, field_name="sku")
 
+        # IMPORTANT:
+        # when editing an existing draft shipment, add back the quantities
+        # already reserved by this shipment itself
+        current_reserved_by_product_id = {}
+        if self.instance and isinstance(self.instance, Shipment):
+            for shipment_item in self.instance.items.all():
+                current_reserved_by_product_id[shipment_item.product_id] = shipment_item.quantity
+
         for item in items:
             product = products_by_sku[item["sku"]]
+
             try:
                 stock = StockLevel.objects.get(
                     warehouse_id=from_warehouse,
@@ -101,11 +110,14 @@ class ShipmentWriteSerializer(serializers.Serializer):
                 })
 
             available_quantity = stock.quantity - stock.reserved_quantity
-            if available_quantity < item["qty"]:
+            current_reserved = current_reserved_by_product_id.get(product.id, 0)
+            effective_available = available_quantity + current_reserved
+
+            if effective_available < item["qty"]:
                 raise serializers.ValidationError({
                     "items": [
                         f"Insufficient available stock for SKU '{item['sku']}'. "
-                        f"Available: {available_quantity}, requested: {item['qty']}."
+                        f"Available: {effective_available}, requested: {item['qty']}."
                     ]
                 })
 

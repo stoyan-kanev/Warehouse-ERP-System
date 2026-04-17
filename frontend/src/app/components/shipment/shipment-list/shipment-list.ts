@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { PaginatedResponse, Shipment, WarehouseMini } from '../shipment.type';
+import { PaginatedResponse, Shipment, ShipmentPayload, WarehouseMini } from '../shipment.type';
 import { ShipmentService } from '../shipment.service';
+import { WarehouseShipForm } from '../warehouse-ship-form/warehouse-ship-form';
+import { StockLevel } from '../../warehouse/warehouse.types';
+import {Warehouse, WarehousesService} from '../../warehouse/warehouses.services';
+import {StockLevelsService} from '../../warehouse/stockLevel.service';
 
 @Component({
     selector: 'app-shipment-list',
     standalone: true,
-    imports: [NgFor, NgIf, NgClass, DatePipe],
+    imports: [NgFor, NgIf, NgClass, DatePipe, WarehouseShipForm],
     templateUrl: './shipment-list.html',
     styleUrl: './shipment-list.css'
 })
@@ -21,10 +25,24 @@ export class ShipmentListComponent implements OnInit {
 
     errorMessage = '';
 
-    constructor(private shipmentService: ShipmentService) {}
+    selectedShipment: Shipment | null = null;
+    isEditOpen = false;
+
+    warehouses: Warehouse[] = [];
+    editStocks: StockLevel[] = [];
+    editStocksLoading = false;
+
+    editWarehouses: Array<{ id: number; name: string; location: string }> = [];
+
+    constructor(
+        private shipmentService: ShipmentService,
+        private warehousesService: WarehousesService,
+        private stockLevelsService: StockLevelsService
+    ) {}
 
     ngOnInit(): void {
         this.loadShipments();
+        this.loadWarehouses();
     }
 
     loadShipments(page: number = 1): void {
@@ -47,6 +65,33 @@ export class ShipmentListComponent implements OnInit {
         });
     }
 
+    loadWarehouses(): void {
+        this.warehousesService.list(false).subscribe({
+            next: (data) => {
+                this.warehouses = data;
+            },
+            error: (err) => {
+                console.error('Failed to load warehouses', err);
+            }
+        });
+    }
+
+    loadStocksForWarehouse(warehouseId: number): void {
+        this.editStocksLoading = true;
+
+        this.stockLevelsService.listByWarehouse(warehouseId).subscribe({
+            next: (rows) => {
+                this.editStocks = rows;
+                this.editStocksLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load stock levels', err);
+                this.editStocks = [];
+                this.editStocksLoading = false;
+            }
+        });
+    }
+
     prevPage(): void {
         if (this.currentPage > 1) {
             this.loadShipments(this.currentPage - 1);
@@ -58,8 +103,6 @@ export class ShipmentListComponent implements OnInit {
             this.loadShipments(this.currentPage + 1);
         }
     }
-
-    // ===== UI HELPERS =====
 
     getWarehouseName(warehouse: Shipment['from_warehouse'] | Shipment['to_warehouse']): string {
         if (!warehouse) return '-';
@@ -94,8 +137,6 @@ export class ShipmentListComponent implements OnInit {
         return product.name || product.sku || `Product #${product.id}`;
     }
 
-    // ===== ACTIONS =====
-
     dispatchShipment(shipment: Shipment): void {
         this.shipmentService.dispatchShipment(shipment.id).subscribe({
             next: (updated) => this.replaceShipmentInList(updated),
@@ -117,9 +158,13 @@ export class ShipmentListComponent implements OnInit {
         });
     }
 
-    // placeholder за бъдещ edit modal
     editShipment(shipment: Shipment): void {
-        console.log('Edit shipment', shipment);
+        this.selectedShipment = shipment;
+        this.isEditOpen = true;
+        this.editStocks = [];
+        this.editWarehouses = this.warehouses.filter(w => w.id !== shipment.from_warehouse.id);
+
+        this.loadStocksForWarehouse(shipment.from_warehouse.id);
     }
 
     replaceShipmentInList(updated: Shipment): void {
@@ -128,13 +173,36 @@ export class ShipmentListComponent implements OnInit {
         );
     }
 
+    onCloseEdit(): void {
+        this.isEditOpen = false;
+        this.selectedShipment = null;
+        this.editStocks = [];
+        this.editWarehouses = [];
+    }
+
+    onUpdateShipment(payload: ShipmentPayload): void {
+        if (!this.selectedShipment) return;
+
+        this.shipmentService.updateShipment(this.selectedShipment.id, payload).subscribe({
+            next: (updated) => {
+                this.replaceShipmentInList(updated);
+                this.onCloseEdit();
+            },
+            error: (err) => {
+                this.handleError(err);
+            }
+        });
+    }
+
     handleError(err: any): void {
         console.error(err);
         this.errorMessage =
             err?.error?.items?.[0] ||
             err?.error?.status ||
+            err?.error?.detail ||
             'Operation failed.';
     }
+
     canEdit(shipment: Shipment): boolean {
         return shipment.status === 'DRAFT';
     }
@@ -149,5 +217,10 @@ export class ShipmentListComponent implements OnInit {
 
     canReceive(shipment: Shipment): boolean {
         return shipment.status === 'SENT' || shipment.status === 'IN_TRANSIT';
+    }
+
+    getEditWarehouses(): Warehouse[] {
+        if (!this.selectedShipment) return this.warehouses;
+        return this.warehouses.filter(w => w.id !== this.selectedShipment!.from_warehouse.id);
     }
 }

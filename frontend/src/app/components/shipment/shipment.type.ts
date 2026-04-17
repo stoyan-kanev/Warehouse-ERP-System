@@ -48,3 +48,15 @@ export interface PaginatedResponse<T> {
     previous: string | null;
     results: T[];
 }
+export interface ShipmentPayload {
+    from_warehouse: number;
+    destination_type: 'warehouse' | 'client';
+    to_warehouse_id: number | null;
+    client_address: string | null;
+    notes: string;
+    items: Array<{
+        sku: string;
+        qty: number;
+        unit: string;
+    }>;
+}

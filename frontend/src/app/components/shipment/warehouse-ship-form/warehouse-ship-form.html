@@ -1,6 +1,6 @@
 <div class="ship-dialog-wrapper">
     <div class="wrap">
-        <h1>Create Shipment</h1>
+        <h1>{{ editMode ? 'Edit Shipment' : 'Create Shipment' }}</h1>
         <button class="close-btn" type="button" (click)="onClose()">X</button>
     </div>
 
@@ -9,12 +9,19 @@
         <div class="row">
             <label class="label">Destination</label>
             <div class="segmented">
-                <button type="button" class="seg-btn" [class.active]="destinationType==='warehouse'"
-                        (click)="setDestination('warehouse')">
+                <button
+                    type="button"
+                    class="seg-btn"
+                    [class.active]="destinationType === 'warehouse'"
+                    (click)="setDestination('warehouse')">
                     To warehouse
                 </button>
-                <button type="button" class="seg-btn" [class.active]="destinationType==='client'"
-                        (click)="setDestination('client')">
+
+                <button
+                    type="button"
+                    class="seg-btn"
+                    [class.active]="destinationType === 'client'"
+                    (click)="setDestination('client')">
                     To client
                 </button>
             </div>
@@ -24,13 +31,33 @@
             <label class="label">To warehouse</label>
             <select class="control" name="toWarehouseId" [(ngModel)]="toWarehouseId" required>
                 <option [ngValue]="null" disabled>Select warehouse</option>
-                <option *ngFor="let w of warehouses" [ngValue]="w.id">{{ w.name }} - {{ w.location }}</option>
+                <option *ngFor="let w of warehouses" [ngValue]="w.id">
+                    {{ w.name }} - {{ w.location }}
+                </option>
             </select>
         </div>
 
         <div class="row" *ngIf="destinationType === 'client'">
             <label class="label">Client address</label>
-            <input class="control" name="clientAddress" [(ngModel)]="clientAddress" minlength="10" required/>
+            <input
+                class="control"
+                name="clientAddress"
+                [(ngModel)]="clientAddress"
+                minlength="3"
+                required
+                placeholder="Enter delivery address"
+            />
+        </div>
+
+        <div class="row">
+            <label class="label">Notes</label>
+            <textarea
+                class="control textarea"
+                name="notes"
+                [(ngModel)]="notes"
+                rows="3"
+                placeholder="Optional shipment notes">
+            </textarea>
         </div>
 
         <div class="divider"></div>
@@ -70,7 +97,7 @@
                             </div>
 
                             <div class="dd-right">
-                                <div class="stock">Stock: {{ p.stockQty }}</div>
+                                <div class="stock">Max allowed: {{ p.stockQty }}</div>
                                 <div class="muted">Sell: {{ p.priceSell }}</div>
                             </div>
                         </button>
@@ -93,19 +120,23 @@
                 <div class="meta">
                     <div class="sku">{{ it.sku }}</div>
                     <div class="name">{{ it.name }}</div>
-                    <div class="muted">Unit: {{ it.unit }} • Available: {{ it.stockQty }}</div>
+                    <div class="muted">
+                        Unit: {{ it.unit }} • Max allowed: {{ it.qty }}
+                    </div>
                 </div>
 
                 <div class="qty">
                     <button type="button" class="qty-btn" (click)="decQty(i)">-</button>
+
                     <input
                         class="qty-input"
                         type="number"
                         [value]="it.qty"
                         (input)="setQty(i, $any($event.target).value)"
-                        min="0"
+                        min="0.01"
                         step="0.01"
                     />
+
                     <button type="button" class="qty-btn" (click)="incQty(i)">+</button>
                 </div>
 
@@ -114,8 +145,13 @@
         </div>
 
         <div class="actions">
-            <button class="primary" type="submit" [disabled]="!canSubmit()">Create shipment</button>
-            <button class="secondary" type="button" (click)="onClose()">Cancel</button>
+            <button class="primary" type="submit" [disabled]="!canSubmit()">
+                {{ editMode ? 'Save changes' : 'Create shipment' }}
+            </button>
+
+            <button class="secondary" type="button" (click)="onClose()">
+                Cancel
+            </button>
         </div>
 
     </form>
