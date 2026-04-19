@@ -6,11 +6,12 @@ import { WarehouseShipForm } from '../warehouse-ship-form/warehouse-ship-form';
 import { StockLevel } from '../../warehouse/warehouse.types';
 import {Warehouse, WarehousesService} from '../../warehouse/warehouses.services';
 import {StockLevelsService} from '../../warehouse/stockLevel.service';
+import {FormsModule} from '@angular/forms';
 
 @Component({
     selector: 'app-shipment-list',
     standalone: true,
-    imports: [NgFor, NgIf, NgClass, DatePipe, WarehouseShipForm],
+    imports: [NgFor, NgIf, NgClass, DatePipe, WarehouseShipForm, FormsModule],
     templateUrl: './shipment-list.html',
     styleUrl: './shipment-list.css'
 })
@@ -34,6 +35,8 @@ export class ShipmentListComponent implements OnInit {
 
     editWarehouses: Array<{ id: number; name: string; location: string }> = [];
 
+    searchTerm = '';
+    lastAppliedSearch = '';
     constructor(
         private shipmentService: ShipmentService,
         private warehousesService: WarehousesService,
@@ -49,7 +52,7 @@ export class ShipmentListComponent implements OnInit {
         this.loading = true;
         this.errorMessage = '';
 
-        this.shipmentService.getShipments(page, this.pageSize).subscribe({
+        this.shipmentService.getShipments(page, this.pageSize, this.searchTerm).subscribe({
             next: (res: PaginatedResponse<Shipment>) => {
                 this.shipments = res.results;
                 this.totalCount = res.count;
@@ -64,7 +67,24 @@ export class ShipmentListComponent implements OnInit {
             }
         });
     }
+    onSearch(): void {
+        this.loadShipments(1);
+    }
+    onSearchBlur(): void {
+        const normalized = this.searchTerm.trim();
 
+        if (normalized === this.lastAppliedSearch) {
+            return;
+        }
+
+        this.lastAppliedSearch = normalized;
+        this.loadShipments(1);
+    }
+    clearSearch(): void {
+        this.searchTerm = '';
+        this.lastAppliedSearch = '';
+        this.loadShipments(1);
+    }
     loadWarehouses(): void {
         this.warehousesService.list(false).subscribe({
             next: (data) => {
@@ -139,21 +159,21 @@ export class ShipmentListComponent implements OnInit {
 
     dispatchShipment(shipment: Shipment): void {
         this.shipmentService.dispatchShipment(shipment.id).subscribe({
-            next: (updated) => this.replaceShipmentInList(updated),
+            next: () => this.loadShipments(this.currentPage),
             error: (err) => this.handleError(err)
         });
     }
 
     receiveShipment(shipment: Shipment): void {
         this.shipmentService.receiveShipment(shipment.id).subscribe({
-            next: (updated) => this.replaceShipmentInList(updated),
+            next: () => this.loadShipments(this.currentPage),
             error: (err) => this.handleError(err)
         });
     }
 
     cancelShipment(shipment: Shipment): void {
         this.shipmentService.cancelShipment(shipment.id).subscribe({
-            next: (updated) => this.replaceShipmentInList(updated),
+            next: () => this.loadShipments(this.currentPage),
             error: (err) => this.handleError(err)
         });
     }

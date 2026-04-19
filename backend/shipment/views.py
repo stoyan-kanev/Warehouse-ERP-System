@@ -25,7 +25,7 @@ class ShipmentViewSet(
     pagination_class = DefaultPagination
 
     def get_queryset(self):
-        return (
+        queryset = (
             Shipment.objects
             .select_related("from_warehouse", "to_warehouse", "created_by")
             .prefetch_related("items__product")
@@ -42,6 +42,16 @@ class ShipmentViewSet(
             )
             .order_by('status_order', '-created_at')
         )
+
+        search = self.request.query_params.get("search", "").strip()
+
+        if search:
+            if search.isdigit():
+                queryset = queryset.filter(id=int(search))
+            else:
+                queryset = queryset.none()
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:

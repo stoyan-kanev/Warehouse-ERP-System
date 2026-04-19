@@ -22,6 +22,24 @@
                 Track and manage warehouse transfers and deliveries.
             </p>
         </div>
+        <div class="shipment-toolbar">
+            <div class="search-box">
+                <input
+                    type="text"
+                    placeholder="Search by shipment ID..."
+                    [(ngModel)]="searchTerm"
+                    (blur)="onSearchBlur()"
+                />
+
+                <button
+                    *ngIf="searchTerm"
+                    class="btn ghost"
+                    type="button"
+                    (click)="clearSearch()">
+                    Clear
+                </button>
+            </div>
+        </div>
     </div>
 
     <div *ngIf="errorMessage" class="error-box">
@@ -35,7 +53,12 @@
 
     <div *ngIf="!loading && shipments.length === 0" class="state-box empty-box">
         <h3>No shipments found</h3>
-        <p>There are no shipments to display at the moment.</p>
+        <p *ngIf="searchTerm; else noShipmentsMessage">
+            No shipment matches ID "{{ searchTerm }}".
+        </p>
+        <ng-template #noShipmentsMessage>
+            <p>There are no shipments to display at the moment.</p>
+        </ng-template>
     </div>
 
     <div *ngIf="!loading && shipments.length > 0" class="shipments-list">

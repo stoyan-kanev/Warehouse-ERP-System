@@ -13,11 +13,18 @@ export class ShipmentService {
     constructor(private http: HttpClient) {
     }
 
+    getShipments(
+        page: number = 1,
+        pageSize: number = 10,
+        search: string = ''
+    ): Observable<PaginatedResponse<Shipment>> {
+        let url = `${this.apiUrl}/shipments/?page=${page}&page_size=${pageSize}`;
 
-    getShipments(page: number = 1, pageSize: number = 10): Observable<PaginatedResponse<Shipment>> {
-        return this.http.get<PaginatedResponse<Shipment>>(
-            `${this.apiUrl}/shipments/?page=${page}&page_size=${pageSize}`
-        );
+        if (search.trim()) {
+            url += `&search=${encodeURIComponent(search.trim())}`;
+        }
+
+        return this.http.get<PaginatedResponse<Shipment>>(url);
     }
 
     getShipmentById(id: number): Observable<Shipment> {
