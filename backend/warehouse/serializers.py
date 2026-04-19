@@ -14,14 +14,19 @@ class WarehouseSerializer(serializers.ModelSerializer):
 
 
 
-
 class StockLevelSerializer(serializers.ModelSerializer):
     sku = serializers.CharField(write_only=True, required=False)
 
     product_sku = serializers.CharField(source="product.sku", read_only=True)
     product_name = serializers.CharField(source="product.name", read_only=True)
     product_unit = serializers.CharField(source="product.unit", read_only=True)
-    price_sell = serializers.DecimalField(source="product.price_sell", max_digits=10, decimal_places=2, read_only=True)
+    price_sell = serializers.DecimalField(
+        source="product.price_sell",
+        max_digits=10,
+        decimal_places=2,
+        read_only=True
+    )
+    product_image = serializers.ImageField(source="product.image", read_only=True)
 
     class Meta:
         model = StockLevel
@@ -41,6 +46,7 @@ class StockLevelSerializer(serializers.ModelSerializer):
             "product_name",
             "product_unit",
             "price_sell",
+            "product_image",
         ]
         extra_kwargs = {
             "warehouse": {"required": False},
@@ -71,4 +77,3 @@ class StockLevelSerializer(serializers.ModelSerializer):
 
         validated_data["product"] = product
         return super().create(validated_data)
-

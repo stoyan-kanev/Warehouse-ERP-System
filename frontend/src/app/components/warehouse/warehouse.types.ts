@@ -6,7 +6,7 @@ export type StockLevel = {
     product_unit: string;
     price_sell: string;
     price_buy: string;
-
+    product_image: string;
     warehouse: number;
     warehouse_name: string;
 

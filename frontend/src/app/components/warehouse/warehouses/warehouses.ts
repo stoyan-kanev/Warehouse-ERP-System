@@ -338,7 +338,17 @@ export class WarehousesComponent implements OnInit {
         this.shipmentEditMode = false;
         this.editingShipment = null;
     }
+    getImageUrl(path: string): string {
+        if (!path) return '';
 
+        // ако вече е абсолютен URL
+        if (path.startsWith('http')) {
+            return path;
+        }
+
+        // иначе добавяме backend URL
+        return `http://127.0.0.1:8000${path}`;
+    }
     saveShipment(payload: ShipmentPayload): void {
         if (this.shipmentEditMode && this.editingShipment) {
             this.shipmentServices.updateShipment(this.editingShipment.id, payload).subscribe({
