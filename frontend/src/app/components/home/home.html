@@ -1,1 +1,166 @@
-<p>home works!</p>
+<div class="home-page">
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                Warehouse ERP System
+            </div>
+
+            <h1>
+                Smart warehouse operations,
+                <span>end-to-end inventory control</span>
+            </h1>
+
+            <p class="hero-text">
+                A modern ERP platform designed to streamline warehouse management,
+                stock visibility, and shipment execution through a clean and scalable interface.
+            </p>
+
+            <div class="hero-actions">
+                <button class="btn btn-primary">Explore Inventory</button>
+                <button class="btn btn-secondary">View Shipments</button>
+            </div>
+
+            <div class="hero-mini-stats">
+                <div class="mini-stat">
+                    <strong>99.9%</strong>
+                    <span>Operational visibility</span>
+                </div>
+                <div class="mini-stat">
+                    <strong>Real-time</strong>
+                    <span>Stock awareness</span>
+                </div>
+                <div class="mini-stat">
+                    <strong>Modular</strong>
+                    <span>ERP architecture</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="visual-shell">
+                <div class="visual-topbar">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="visual-grid">
+                    <div class="visual-card large">
+                        <div class="card-kicker">Live Inventory Overview</div>
+                        <div class="card-value">12,480</div>
+                        <div class="card-sub">Units across active warehouses</div>
+                    </div>
+
+                    <div class="visual-card">
+                        <div class="card-kicker">Reserved Stock</div>
+                        <div class="card-value small">1,920</div>
+                    </div>
+
+                    <div class="visual-card">
+                        <div class="card-kicker">Today’s Shipments</div>
+                        <div class="card-value small">37</div>
+                    </div>
+
+                    <div class="visual-card wide">
+                        <div class="bar-row">
+                            <span>Warehouse Utilization</span>
+                            <strong>78%</strong>
+                        </div>
+                        <div class="fake-chart">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="section-heading">
+            <h2>Operational Snapshot</h2>
+            <p>Core business metrics surfaced through a modern ERP dashboard experience.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" *ngFor="let stat of statCards">
+                <div class="stat-label">{{ stat.label }}</div>
+                <div class="stat-value">{{ stat.value }}</div>
+                <div class="stat-trend" [class.positive]="stat.positive">
+                    {{ stat.trend }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="section-heading">
+            <h2>Why this platform stands out</h2>
+            <p>
+                Built to reflect real warehouse workflows with a polished interface and clear operational focus.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card" *ngFor="let feature of featureCards">
+                <div class="feature-badge">{{ feature.badge }}</div>
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bottom-grid">
+        <div class="quick-actions-panel">
+            <div class="panel-header">
+                <h2>Quick Actions</h2>
+                <p>Jump straight into the most critical warehouse flows.</p>
+            </div>
+
+            <div class="actions-grid">
+                <button class="action-tile">
+                    <span class="tile-title">Create Shipment</span>
+                    <span class="tile-desc">Start a new stock transfer workflow</span>
+                </button>
+
+                <button class="action-tile">
+                    <span class="tile-title">Add Warehouse Stock</span>
+                    <span class="tile-desc">Register inventory into a selected warehouse</span>
+                </button>
+
+                <button class="action-tile">
+                    <span class="tile-title">Review Alerts</span>
+                    <span class="tile-desc">See shortages and operational exceptions</span>
+                </button>
+
+                <button class="action-tile">
+                    <span class="tile-title">Manage Products</span>
+                    <span class="tile-desc">Open product catalog and inventory data</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="activity-panel">
+            <div class="panel-header">
+                <h2>Recent Activity</h2>
+                <p>Latest operational events across the ERP environment.</p>
+            </div>
+
+            <div class="activity-list">
+                <div class="activity-item" *ngFor="let item of activities">
+                    <div class="activity-dot" [ngClass]="getActivityClass(item.type)"></div>
+                    <div class="activity-content">
+                        <div class="activity-title">{{ item.title }}</div>
+                        <div class="activity-subtitle">{{ item.subtitle }}</div>
+                    </div>
+                    <div class="activity-time">{{ item.time }}</div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

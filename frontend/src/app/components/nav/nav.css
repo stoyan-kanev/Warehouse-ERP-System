@@ -1,43 +1,99 @@
-.nav_wrapper{
+.nav_wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 20px;
+    padding: 14px 24px;
+
+    backdrop-filter: blur(14px);
+    background: rgba(15, 23, 42, 0.75);
+
+    border-bottom: 1px solid var(--stroke);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
 
-.nav_list{
+/* LEFT NAV */
+.nav_list {
     display: flex;
-    flex-direction: row;
-    gap: 10px;
+    gap: 6px;
 }
-.nav_list a{
+
+/* NAV LINKS */
+.nav_list a {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    border: none;
-    border-radius: var(--radius);
-    background-color: var(--accent-color);
-    color: white;
-    padding: 0.6em 1.2em;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-.nav_list a:hover {
-    background-color: #0062cc;
-}
-.nav_list a:active {
-    transform: scale(0.98);
-}
-.user-info{
-    margin-right: 20px;
-}
-.right_options{
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    align-items: center;
+    gap: 6px;
 
+    padding: 8px 14px;
+    border-radius: 10px;
+
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+
+    background: transparent;
+    border: 1px solid transparent;
+
+    transition: all 0.18s ease;
+}
+
+/* HOVER */
+.nav_list a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.06);
+    border-color: var(--stroke);
+}
+
+/* ACTIVE LINK */
+.nav_list a.active {
+    color: white;
+    background: linear-gradient(
+        135deg,
+        rgba(96,165,250,0.25),
+        rgba(59,130,246,0.15)
+    );
+    border-color: rgba(96,165,250,0.35);
+    box-shadow: 0 4px 14px rgba(59,130,246,0.25);
+}
+
+/* RIGHT SIDE */
+.right_options {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* USER INFO */
+.user-info {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+/* AVATAR (ако добавиш) */
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* BUTTON (logout примерно) */
+.nav-btn {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--stroke);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.08);
 }
